@@ -2,6 +2,7 @@ const ObjectId = require("mongoose").Types.ObjectId;
 
 const Fuel = require('../../models/Fuel');
 const Service = require('../../models/Service');
+const ServiceCategories = require('../../models/ServiceCategory');
 
 const utils = require('../../utils/efficiency') 
 
@@ -56,6 +57,18 @@ exports.addServiceEntry = async ({userId,date,odometerReading,inDetail,totalCost
     }
 }
 
+exports.getServiceCategories = async()=>{
+    try {
+
+        const serviceCategoriesFromDb = await ServiceCategories.find();
+
+        return {statusCode:200,categories:serviceCategoriesFromDb}
+        
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
+}
 
 exports.efficiencyCalculator = async({userId})=>{
     try {
@@ -98,6 +111,57 @@ exports.efficiencyCalculator = async({userId})=>{
 
         return {statusCode:200,data:fuelDataFromDb,analytics:analytics}
 
+        
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
+}
+
+exports.getServiceLog = async({userId,page})=>{
+    try {
+
+        const servicesFromDb = await Service.aggregate([
+            {
+                $match:{
+                    user:new ObjectId(userId)
+                }
+            },
+            {
+                $unwind:"$inDetail"
+
+            },
+            {
+                $lookup:{
+                    from:"servicecategories",
+                    localField:"inDetail.category",
+                    foreignField:"_id",
+                    as:"serviceCategory"
+                }
+            },
+            {
+                $unwind:"$serviceCategory"
+
+            },
+            {
+                $project:{
+                    _id:1,
+                    date:1,
+                    odometerReading:1,
+                    totalCost:1,
+                    note:1,
+                    "inDetail":{
+                        item:"$inDetail.item",
+                        cost:"$inDetail.price",
+                        categoryName:"serviceCategory.name",
+                    }
+                }
+            }
+        ])
+
+        if(servicesFromDb.length == 0) return{statusCode:409,message:"No service history found"}
+
+        return{statusCode:200,serviceLog:servicesFromDb} 
         
     } catch (error) {
         console.log(error);
