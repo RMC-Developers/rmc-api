@@ -48,9 +48,9 @@ server.use('/test',(req,res,next)=>{
     res.send({message:"server listening"})
 })
 
-   dbConnnection.dbConnection.then(()=>{
+ //  dbConnnection.dbConnection.then(()=>{
   server.listen(8080,()=>{
     console.log('listening on port');
 })
-  })
+  //})
 
