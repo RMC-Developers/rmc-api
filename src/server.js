@@ -1,26 +1,21 @@
-const express = require('express');
-const bodyParser = require("body-parser");
-const cors = require('cors');
+// const express = require('express');
+// const bodyParser = require("body-parser");
+// const cors = require('cors');
 
 
-const indexRoutes = require("./routes/index");
-const dbConnnection = require("./configurations/databaseConfiguration");
-const {PORT} = require('./configurations/constants')
+// const indexRoutes = require("./routes/index");
+ const dbConnnection = require("./configurations/databaseConfiguration");
+// const {PORT} = require('./configurations/constants')
 
-const server = express();
+// const server = express();
 
-server.use(bodyParser.json())
-server.use(cors());
+// server.use(bodyParser.json())
+// server.use(cors());
 
 
 
-//routing
-//server.use("/v1/",indexRoutes);
-
-server.use('/test',(req,res,next)=>{
-  res.send({message:"server listening"})
-})
-
+// //routing
+// server.use("/v1/",indexRoutes);
 
 // //Handling invalid api request
 // server.use((req, res, next) => {
@@ -38,23 +33,24 @@ server.use('/test',(req,res,next)=>{
 //   res.status(statusCode).json({ data: { message } });
 // });
 
-  // dbConnnection.dbConnection.then(()=>{
-   
-  // })
+//   dbConnnection.dbConnection.then(()=>{
+//     server.listen(PORT,()=>{
+//         console.log("Server started at:",PORT)
+//     })
+//   })
 
-  server.listen(8080,()=>{
-    console.log("Server started at:",PORT)
+
+const express = require('express');
+
+const server = express();
+
+server.use('/test',(req,res,next)=>{
+    res.send({message:"server listening"})
 })
 
+   dbConnnection.dbConnection.then(()=>{
+  server.listen(8080,()=>{
+    console.log('listening on port');
+})
+  })
 
-// const express = require('express');
-
-// const server = express();
-
-// server.use('/test',(req,res,next)=>{
-//     res.send({message:"server listening"})
-// })
-
-// server.listen(8080,()=>{
-//     console.log('listening on port');
-// })
