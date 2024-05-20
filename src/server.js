@@ -40,17 +40,5 @@ server.use((error, req, res, next) => {
   })
 
 
-// const express = require('express');
 
-// const server = express();
-
-// server.use('/test',(req,res,next)=>{
-//     res.send({message:"server listening"})
-// })
-
-//  //  dbConnnection.dbConnection.then(()=>{
-//   server.listen(8080,()=>{
-//     console.log('listening on port');
-// })
-//   //})
 
