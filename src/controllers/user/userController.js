@@ -1,6 +1,6 @@
 
 const {signup,signin} = require('../../services/auth/user');
-const {addServiceEntry,addFuelEntry,efficiencyCalculator,getServiceCategories,getServiceLog} = require('../../services/general/general');
+const {addServiceEntry,addFuelEntry,efficiencyCalculator,getServiceCategories,getServiceLog,getFuelLog} = require('../../services/general/general');
 
 exports.signin = async (req, res, next) => {
     try {
@@ -65,7 +65,17 @@ exports.signin = async (req, res, next) => {
   exports.getServiceLog =  async(req, res, next) => {
     try {
       const response = await getServiceLog(req.body);
-      res.status(response.statusCode).send({message:response.message,getServiceLog:response.serviceLog});
+      res.status(response.statusCode).send({message:response.message,serviceLog:response.serviceLog});
+    } catch (error) {
+      const err = new Error(error.message);
+      next(err);
+    }
+  };
+
+  exports.getFuelLog =  async(req, res, next) => {
+    try {
+      const response = await getFuelLog(req.body);
+      res.status(response.statusCode).send({message:response.message,fuelLog:response.fuelLog});
     } catch (error) {
       const err = new Error(error.message);
       next(err);
