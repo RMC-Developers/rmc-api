@@ -4,7 +4,7 @@
 
 
 // const indexRoutes = require("./routes/index");
- const dbConnnection = require("./configurations/databaseConfiguration");
+ //const dbConnnection = require("./configurations/databaseConfiguration");
 // const {PORT} = require('./configurations/constants')
 
 // const server = express();
