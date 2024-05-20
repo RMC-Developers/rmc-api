@@ -33,11 +33,13 @@ server.use((error, req, res, next) => {
   res.status(statusCode).json({ data: { message } });
 });
 
-  dbConnnection.dbConnection.then(()=>{
-    server.listen(8080,()=>{
-        console.log("Server started at:",PORT)
-    })
-  })
+  // dbConnnection.dbConnection.then(()=>{
+   
+  // })
+
+  server.listen(8080,()=>{
+    console.log("Server started at:",PORT)
+})
 
 
 // const express = require('express');
