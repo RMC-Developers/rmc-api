@@ -15,7 +15,12 @@ server.use(cors());
 
 
 //routing
-server.use("/v1/",indexRoutes);
+//server.use("/v1/",indexRoutes);
+
+server.use('/test',(req,res,next)=>{
+  res.send({message:"server listening"})
+})
+
 
 //Handling invalid api request
 server.use((req, res, next) => {
