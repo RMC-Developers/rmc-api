@@ -1,8 +1,10 @@
 const express = require("express");
 
-const {createFuelEntry,getFuelEfficiencyReport,createServiceEntry,getServiceCategories,getServiceLog,getFuelLog,fuelReport,getFuelEfficiencyReportTest} = require('../../controllers/user/userController')
+const {createFuelEntry,getFuelEfficiencyReport,createServiceEntry,getServiceCategories,getServiceLog,getFuelLog,fuelReport,getFuelEfficiencyReportTest,getUser} = require('../../controllers/user/userController')
 
 const router = express.Router();
+
+router.get('/get-user-with-token',getUser)
 
 router.post('/create-fuel-entry',createFuelEntry);
 router.post('/create-service-entry',createServiceEntry);

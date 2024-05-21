@@ -80,3 +80,20 @@ exports.userVerification = async ({ userId }) => {
         throw error;
     }
 }
+
+exports.getUser = async({userId})=>{
+    try {
+
+        const userFromDb = await User.findById(new ObjectId(userId),{password:0});
+        if (!userFromDb) return { statusCode: 409, message: `User not found` }
+
+        return {statusCode:200,user:userFromDb}
+
+
+        return { statusCode: 200 }
+
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
+}
