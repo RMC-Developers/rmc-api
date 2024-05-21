@@ -18,6 +18,10 @@ const userSchema = new Schema({
     required: true,
   },
 
+  otp:{
+    type:Schema.Types.String
+  }
+
 });
 
 module.exports = mongoose.model("User",userSchema);

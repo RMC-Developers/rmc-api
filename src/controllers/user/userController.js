@@ -1,5 +1,5 @@
 
-const {signup,signin,getUser} = require('../../services/auth/user');
+const {signup,signin,getUser,sendOTPToUser,signinWithOTP} = require('../../services/auth/user');
 const {addServiceEntry,addFuelEntry,efficiencyCalculator,getServiceCategories,getServiceLog,getFuelLog,fuelReport, fuelEfficiencyReport} = require('../../services/general/general');
 
 exports.signin = async (req, res, next) => {
@@ -15,6 +15,27 @@ exports.signin = async (req, res, next) => {
   exports.signup = async (req, res, next) => {
     try {
       const response = await signup(req.body);
+      res.status(response.statusCode).send({message:response.message});
+    } catch (error) {
+      const err = new Error(error.message);
+      next(err);
+    }
+  };
+
+  exports.signinWithOTP = async (req, res, next) => {
+    try {
+      const response = await signinWithOTP(req.body);
+      res.status(response.statusCode).send({message:response.message,user:response.user,token:response.token});
+    } catch (error) {
+      const err = new Error(error.message);
+      next(err);
+    }
+  };
+
+
+  exports.sendOTPToUser = async (req, res, next) => {
+    try {
+      const response = await sendOTPToUser(req.body);
       res.status(response.statusCode).send({message:response.message});
     } catch (error) {
       const err = new Error(error.message);
