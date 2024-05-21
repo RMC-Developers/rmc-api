@@ -105,6 +105,40 @@ exports.efficiencyCalculator = async({userId})=>{
         let costFor1Km = utils.costForOneKilometer(fuelDataFromDb[0].unitPrice,mileage);
         let fuelFor1Km = utils.fuelForOneKilometer(mileage);
 
+
+        const fuelAnalytics = await Fuel.aggregate([
+            {
+                $match:{
+                    user:new ObjectId(userId)
+                }
+            },
+            {
+                $sort:{
+                    date:-1
+                }
+            },
+            {
+                $group:{
+                    _id:null,
+                    firstOdometerReading:{$first:"$odometerReading"},
+                    lastOdometerReading:{$last:"$odometerReading"},
+                    totalVolumeOfFuelConsumed:{
+                        $sum:"$volume"
+                    },
+                    totalCostForFuelConsumed:{
+                        $sum:{$multiply:["$unitPrice","$volume"]}
+                    }
+                }
+            },
+            {
+                $project:{
+                    totalDistanceTravelled:{$subtract:["$firstOdometerReading","$lastOdometerReading"]},
+                    totalVolumeOfFuelConsumed:1,
+                    totalCostForFuelConsumed:1
+                }
+            }
+        ])
+
         let analytics = {
             totalDistance:distance,
             totalVolume:volume,
@@ -114,9 +148,55 @@ exports.efficiencyCalculator = async({userId})=>{
 
         }
 
-        return {statusCode:200,data:fuelDataFromDb,analytics:analytics}
+        return {statusCode:200,data:fuelDataFromDb,analytics:fuelAnalytics}
 
         
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
+}
+
+exports.fuelReport= async({userId})=>{
+    try {
+        
+        const consumptionReport = await Fuel.aggregate([
+            {
+                $match:{
+                    user:new ObjectId(userId)
+                }
+            },
+            {
+                $sort:{
+                    date:-1
+                }
+            },
+            {
+                $group:{
+                    _id:null,
+                    firstOdometerReading:{$first:"$odometerReading"},
+                    lastOdometerReading:{$last:"$odometerReading"},
+                    totalVolumeOfFuelConsumed:{
+                        $sum:"$volume"
+                    },
+                    totalCostForFuelConsumed:{
+                        $sum:{$multiply:["$unitPrice","$volume"]}
+                    }
+                }
+            },
+            {
+                $project:{
+                    totalDistanceTravelled:{$subtract:["$firstOdometerReading","$lastOdometerReading"]},
+                    totalVolumeOfFuelConsumed:1,
+                    totalCostForFuelConsumed:1
+                }
+            }
+        ])
+
+        if(consumptionReport.length == 0) return {statusCode:409,message:"No data to show"}
+        return {statusCode:200,consumptionReport:{totalFuelConsumed:(consumptionReport[0]?.totalVolumeOfFuelConsumed).toFixed(2)||null,totalCostForFuelConsumed:(consumptionReport[0]?.totalCostForFuelConsumed).toFixed(2)||null,totalDistanceTravelled:(consumptionReport[0]?.totalDistanceTravelled).toFixed(2)||null}}
+        
+
     } catch (error) {
         console.log(error);
         throw error;
