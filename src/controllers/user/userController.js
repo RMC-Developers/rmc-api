@@ -1,6 +1,6 @@
 
-const {signup,signin} = require('../../services/auth/user');
-const {addServiceEntry,addFuelEntry,efficiencyCalculator,getServiceCategories,getServiceLog,getFuelLog} = require('../../services/general/general');
+const {signup,signin,getUser,sendOTPToUser,signinWithOTP} = require('../../services/auth/user');
+const {addServiceEntry,addFuelEntry,efficiencyCalculator,getServiceCategories,getServiceLog,getFuelLog,fuelReport, fuelEfficiencyReport} = require('../../services/general/general');
 
 exports.signin = async (req, res, next) => {
     try {
@@ -16,6 +16,37 @@ exports.signin = async (req, res, next) => {
     try {
       const response = await signup(req.body);
       res.status(response.statusCode).send({message:response.message});
+    } catch (error) {
+      const err = new Error(error.message);
+      next(err);
+    }
+  };
+
+  exports.signinWithOTP = async (req, res, next) => {
+    try {
+      const response = await signinWithOTP(req.body);
+      res.status(response.statusCode).send({message:response.message,user:response.user,token:response.token});
+    } catch (error) {
+      const err = new Error(error.message);
+      next(err);
+    }
+  };
+
+
+  exports.sendOTPToUser = async (req, res, next) => {
+    try {
+      const response = await sendOTPToUser(req.body);
+      res.status(response.statusCode).send({message:response.message});
+    } catch (error) {
+      const err = new Error(error.message);
+      next(err);
+    }
+  };
+
+  exports.getUser = async (req, res, next) => {
+    try {
+      const response = await getUser(req.body);
+      res.status(response.statusCode).send({message:response.message,user:response.user});
     } catch (error) {
       const err = new Error(error.message);
       next(err);
@@ -42,10 +73,30 @@ exports.signin = async (req, res, next) => {
     }
   };
 
-  exports.getFuelEfficiencyReport = async(req, res, next) => {
+  exports.getFuelEfficiencyReportTest = async(req, res, next) => {
     try {
       const response = await efficiencyCalculator(req.body);
       res.status(response.statusCode).send({message:response.message,efficiencyData:response.data,analytics:response.analytics});
+    } catch (error) {
+      const err = new Error(error.message);
+      next(err);
+    }
+  };
+
+  exports.getFuelEfficiencyReport = async(req, res, next) => {
+    try {
+      const response = await fuelEfficiencyReport(req.body);
+      res.status(response.statusCode).send({message:response.message,analytics:response.analytics});
+    } catch (error) {
+      const err = new Error(error.message);
+      next(err);
+    }
+  };
+
+  exports.fuelReport = async(req, res, next) => {
+    try {
+      const response = await fuelReport(req.body);
+      res.status(response.statusCode).send({message:response.message,fuelReport:response.consumptionReport});
     } catch (error) {
       const err = new Error(error.message);
       next(err);
