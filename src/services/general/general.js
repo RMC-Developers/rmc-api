@@ -4,10 +4,10 @@ const Fuel = require('../../models/Fuel');
 const Service = require('../../models/Service');
 const ServiceCategories = require('../../models/ServiceCategory');
 
-const utils = require('../../utils/efficiency') 
+const utils = require('../../utils/efficiency')
 
 
-exports.addFuelEntry = async ({userId,date,odometerReading,volume,unitPrice,note,fullTank})=>{
+exports.addFuelEntry = async ({ userId, date, odometerReading, volume, unitPrice, note, fullTank }) => {
     try {
 
         const fuelObj = new Fuel({
@@ -22,17 +22,17 @@ exports.addFuelEntry = async ({userId,date,odometerReading,volume,unitPrice,note
 
         await fuelObj.save();
 
-        return {statusCode:200,message:"entry saved successfully"}
+        return { statusCode: 200, message: "entry saved successfully" }
 
 
-        
+
     } catch (error) {
         console.log(error);
         throw error;
     }
 }
 
-exports.addServiceEntry = async ({userId,date,odometerReading,inDetail,totalCost,note})=>{
+exports.addServiceEntry = async ({ userId, date, odometerReading, inDetail, totalCost, note }) => {
     try {
 
         const serviceObj = new Service({
@@ -42,56 +42,56 @@ exports.addServiceEntry = async ({userId,date,odometerReading,inDetail,totalCost
             inDetail: inDetail,
             totalCost: totalCost,
             note: note,
-           
+
         })
 
         await serviceObj.save();
 
-        return {statusCode:200,message:"entry saved successfully"}
+        return { statusCode: 200, message: "entry saved successfully" }
 
 
-        
+
     } catch (error) {
         console.log(error);
         throw error;
     }
 }
 
-exports.getServiceCategories = async()=>{
+exports.getServiceCategories = async () => {
     try {
 
         const serviceCategoriesFromDb = await ServiceCategories.find();
 
-        return {statusCode:200,categories:serviceCategoriesFromDb}
-        
+        return { statusCode: 200, categories: serviceCategoriesFromDb }
+
     } catch (error) {
         console.log(error);
         throw error;
     }
 }
 
-exports.efficiencyCalculator = async({userId})=>{
+exports.efficiencyCalculator = async ({ userId }) => {
     try {
 
         //const fuelDataFromDb = await Fuel.find({user:new ObjectId(userId)}).sort({date:1});
 
         const fuelDataFromDb = await Fuel.aggregate([
             {
-                $match:{
-                    user:new ObjectId(userId)
+                $match: {
+                    user: new ObjectId(userId)
                 }
             },
             {
-                $sort:{
-                    date:-1
+                $sort: {
+                    date: -1
                 }
             },
             {
-                $limit:2
+                $limit: 2
             }
         ])
 
-        if(fuelDataFromDb.length < 2) return {statusCode:409,message:"Not enough data for calculations"}
+        if (fuelDataFromDb.length < 2) return { statusCode: 409, message: "Not enough data for calculations" }
 
         let distance = fuelDataFromDb[0].odometerReading - fuelDataFromDb[1].odometerReading;
         // const sum = fuelDataFromDb.reduce((accumulator, current) => accumulator + current.volume, 0);
@@ -101,101 +101,55 @@ exports.efficiencyCalculator = async({userId})=>{
 
 
 
-        let mileage = utils.KilometerForOneLiter(distance,volume);
-        let costFor1Km = utils.costForOneKilometer(fuelDataFromDb[0].unitPrice,mileage);
+        let mileage = utils.KilometerForOneLiter(distance, volume);
+        let costFor1Km = utils.costForOneKilometer(fuelDataFromDb[0].unitPrice, mileage);
         let fuelFor1Km = utils.fuelForOneKilometer(mileage);
 
 
         const fuelAnalytics = await Fuel.aggregate([
             {
-                $match:{
-                    user:new ObjectId(userId)
+                $match: {
+                    user: new ObjectId(userId)
                 }
             },
             {
-                $sort:{
-                    date:-1
+                $sort: {
+                    date: -1
                 }
             },
             {
-                $group:{
-                    _id:null,
-                    firstOdometerReading:{$first:"$odometerReading"},
-                    lastOdometerReading:{$last:"$odometerReading"},
-                    totalVolumeOfFuelConsumed:{
-                        $sum:"$volume"
+                $group: {
+                    _id: null,
+                    firstOdometerReading: { $first: "$odometerReading" },
+                    lastOdometerReading: { $last: "$odometerReading" },
+                    totalVolumeOfFuelConsumed: {
+                        $sum: "$volume"
                     },
-                    totalCostForFuelConsumed:{
-                        $sum:{$multiply:["$unitPrice","$volume"]}
+                    totalCostForFuelConsumed: {
+                        $sum: { $multiply: ["$unitPrice", "$volume"] }
                     }
                 }
             },
             {
-                $project:{
-                    totalDistanceTravelled:{$subtract:["$firstOdometerReading","$lastOdometerReading"]},
-                    totalVolumeOfFuelConsumed:1,
-                    totalCostForFuelConsumed:1
+                $project: {
+                    totalDistanceTravelled: { $subtract: ["$firstOdometerReading", "$lastOdometerReading"] },
+                    totalVolumeOfFuelConsumed: 1,
+                    totalCostForFuelConsumed: 1
                 }
             }
         ])
 
         let analytics = {
-            totalDistance:distance,
-            totalVolume:volume,
-            mileage:mileage,
-            costFor1Km:costFor1Km,
-            fuelFor1Km:fuelFor1Km
+            totalDistance: distance,
+            totalVolume: volume,
+            mileage: mileage,
+            costFor1Km: costFor1Km,
+            fuelFor1Km: fuelFor1Km
 
         }
 
-        return {statusCode:200,data:fuelDataFromDb,analytics:fuelAnalytics}
+        return { statusCode: 200, data: fuelDataFromDb, analytics: fuelAnalytics }
 
-        
-    } catch (error) {
-        console.log(error);
-        throw error;
-    }
-}
-
-exports.fuelReport= async({userId})=>{
-    try {
-        
-        const consumptionReport = await Fuel.aggregate([
-            {
-                $match:{
-                    user:new ObjectId(userId)
-                }
-            },
-            {
-                $sort:{
-                    date:-1
-                }
-            },
-            {
-                $group:{
-                    _id:null,
-                    firstOdometerReading:{$first:"$odometerReading"},
-                    lastOdometerReading:{$last:"$odometerReading"},
-                    totalVolumeOfFuelConsumed:{
-                        $sum:"$volume"
-                    },
-                    totalCostForFuelConsumed:{
-                        $sum:{$multiply:["$unitPrice","$volume"]}
-                    }
-                }
-            },
-            {
-                $project:{
-                    totalDistanceTravelled:{$subtract:["$firstOdometerReading","$lastOdometerReading"]},
-                    totalVolumeOfFuelConsumed:1,
-                    totalCostForFuelConsumed:1
-                }
-            }
-        ])
-
-        if(consumptionReport.length == 0) return {statusCode:409,message:"No data to show"}
-        return {statusCode:200,consumptionReport:{totalFuelConsumed:(consumptionReport[0]?.totalVolumeOfFuelConsumed).toFixed(2)||null,totalCostForFuelConsumed:(consumptionReport[0]?.totalCostForFuelConsumed).toFixed(2)||null,totalDistanceTravelled:(consumptionReport[0]?.totalDistanceTravelled).toFixed(2)||null}}
-        
 
     } catch (error) {
         console.log(error);
@@ -203,92 +157,184 @@ exports.fuelReport= async({userId})=>{
     }
 }
 
-exports.getServiceLog = async({userId,page})=>{
-    try {
-
-        const servicesFromDb = await Service.aggregate([
-            {
-                $match:{
-                    user:new ObjectId(userId)
-                }
-            },
-            {
-                $unwind:"$inDetail"
-
-            },
-            {
-                $lookup:{
-                    from:"servicecategories",
-                    localField:"inDetail.category",
-                    foreignField:"_id",
-                    as:"serviceCategory"
-                }
-            },
-            {
-                $unwind:"$serviceCategory"
-
-            },
-            {
-                $project:{
-                    _id:1,
-                    date:1,
-                    odometerReading:1,
-                    totalCost:1,
-                    note:1,
-                    "inDetail":{
-                        item:"$inDetail.item",
-                        cost:"$inDetail.price",
-                        categoryName:"serviceCategory.name",
-                    }
-                }
-            }
-        ])
-
-        if(servicesFromDb.length == 0) return{statusCode:409,message:"No service history found"}
-
-        return{statusCode:200,serviceLog:servicesFromDb} 
-        
-    } catch (error) {
-        console.log(error);
-        throw error;
-    }
-}
-
-exports.getFuelLog = async({userId})=>{
+exports.fuelEfficiencyReport = async ({ userId }) => {
     try {
 
         const fuelDataFromDb = await Fuel.aggregate([
             {
-            $match:{
-                user:new ObjectId(userId)
+                $match: {
+                    user: new ObjectId(userId)
+                }
+            },
+            {
+                $sort: {
+                    date: -1
+                }
+            },
+            {
+                $limit: 2
             }
-        },
-        {
-            $sort:{
-                date:-1
-            }
-        },
-        {
-            $project:{
-                _id:1,
-                date:1, 
-                odometerReading:1,
-                volume:1,
-                unitPrice:1,
-                note:1,
-                fullTank:1,
-            }
+        ])
+
+        if (fuelDataFromDb.length < 2) return { statusCode: 409, message: "Not enough data for calculations" }
+
+        let distance = fuelDataFromDb[0].odometerReading - fuelDataFromDb[1].odometerReading;
+        let volume = fuelDataFromDb[0].volume;
+
+        let mileage = utils.KilometerForOneLiter(distance, volume);
+        let costFor1Km = utils.costForOneKilometer(fuelDataFromDb[0].unitPrice, mileage);
+        let fuelFor1Km = utils.fuelForOneKilometer(mileage);
+
+
+
+
+        let analytics = {
+            mileage: mileage,
+            costFor1Km: costFor1Km,
+            fuelFor1Km: fuelFor1Km
         }
-    ])
-   
-        if(fuelDataFromDb.length == 0) return {statusCode:409,message:"No data available"}
+
+        return { statusCode: 200, data: fuelDataFromDb, analytics: analytics }
+
+
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
+}
+
+exports.fuelReport = async ({ userId }) => {
+    try {
+
+        const consumptionReport = await Fuel.aggregate([
+            {
+                $match: {
+                    user: new ObjectId(userId)
+                }
+            },
+            {
+                $sort: {
+                    date: -1
+                }
+            },
+            {
+                $group: {
+                    _id: null,
+                    firstOdometerReading: { $first: "$odometerReading" },
+                    lastOdometerReading: { $last: "$odometerReading" },
+                    totalVolumeOfFuelConsumed: {
+                        $sum: "$volume"
+                    },
+                    totalCostForFuelConsumed: {
+                        $sum: { $multiply: ["$unitPrice", "$volume"] }
+                    }
+                }
+            },
+            {
+                $project: {
+                    totalDistanceTravelled: { $subtract: ["$firstOdometerReading", "$lastOdometerReading"] },
+                    totalVolumeOfFuelConsumed: 1,
+                    totalCostForFuelConsumed: 1
+                }
+            }
+        ])
+
+        if (consumptionReport.length == 0) return { statusCode: 409, message: "No data to show" }
+        return { statusCode: 200, consumptionReport: { totalFuelConsumed: (consumptionReport[0]?.totalVolumeOfFuelConsumed).toFixed(2) || null, totalCostForFuelConsumed: (consumptionReport[0]?.totalCostForFuelConsumed).toFixed(2) || null, totalDistanceTravelled: (consumptionReport[0]?.totalDistanceTravelled).toFixed(2) || null } }
+
+
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
+}
+
+exports.getServiceLog = async ({ userId, page }) => {
+    try {
+
+        const servicesFromDb = await Service.aggregate([
+            {
+                $match: {
+                    user: new ObjectId(userId)
+                }
+            },
+            {
+                $unwind: "$inDetail"
+
+            },
+            {
+                $lookup: {
+                    from: "servicecategories",
+                    localField: "inDetail.category",
+                    foreignField: "_id",
+                    as: "serviceCategory"
+                }
+            },
+            {
+                $unwind: "$serviceCategory"
+
+            },
+            {
+                $project: {
+                    _id: 1,
+                    date: 1,
+                    odometerReading: 1,
+                    totalCost: 1,
+                    note: 1,
+                    "inDetail": {
+                        item: "$inDetail.item",
+                        cost: "$inDetail.price",
+                        categoryName: "serviceCategory.name",
+                    }
+                }
+            }
+        ])
+
+        if (servicesFromDb.length == 0) return { statusCode: 409, message: "No service history found" }
+
+        return { statusCode: 200, serviceLog: servicesFromDb }
+
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
+}
+
+exports.getFuelLog = async ({ userId }) => {
+    try {
+
+        const fuelDataFromDb = await Fuel.aggregate([
+            {
+                $match: {
+                    user: new ObjectId(userId)
+                }
+            },
+            {
+                $sort: {
+                    date: -1
+                }
+            },
+            {
+                $project: {
+                    _id: 1,
+                    date: 1,
+                    odometerReading: 1,
+                    volume: 1,
+                    unitPrice: 1,
+                    note: 1,
+                    fullTank: 1,
+                }
+            }
+        ])
+
+        if (fuelDataFromDb.length == 0) return { statusCode: 409, message: "No data available" }
 
         let finalArray = [];
 
-        for(let i = 0;i<fuelDataFromDb.length;i++){
-            let obj={};
-            obj.distance = fuelDataFromDb[i].odometerReading-fuelDataFromDb[i+1]?.odometerReading || null;
-            obj.mileage = (obj.distance/fuelDataFromDb[i].volume).toFixed(2);
+        for (let i = 0; i < fuelDataFromDb.length; i++) {
+            let obj = {};
+            obj.distance = fuelDataFromDb[i].odometerReading - fuelDataFromDb[i + 1]?.odometerReading || null;
+            obj.mileage = (obj.distance / fuelDataFromDb[i].volume).toFixed(2);
             obj.volume = fuelDataFromDb[i].volume;
             obj.date = fuelDataFromDb[i].date;
             obj.odometerReading = fuelDataFromDb[i].odometerReading;
@@ -300,8 +346,8 @@ exports.getFuelLog = async({userId})=>{
             finalArray.push(obj);
         }
 
-        return {statusCode:200,fuelLog:finalArray}
-        
+        return { statusCode: 200, fuelLog: finalArray }
+
     } catch (error) {
         console.log(error);
         throw error;
