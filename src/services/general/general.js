@@ -252,43 +252,75 @@ exports.fuelReport = async ({ userId }) => {
 exports.getServiceLog = async ({ userId, page }) => {
     try {
 
+
+
         const servicesFromDb = await Service.aggregate([
             {
                 $match: {
                     user: new ObjectId(userId)
                 }
             },
-            {
-                $unwind: "$inDetail"
 
+            {
+                "$unwind": "$inDetail"
             },
             {
-                $lookup: {
-                    from: "servicecategories",
-                    localField: "inDetail.category",
-                    foreignField: "_id",
-                    as: "serviceCategory"
+                "$lookup": {
+                    "from": "servicecategories",
+                    "localField": "inDetail.category",
+                    "foreignField": "_id",
+                    "as": "categoryData"
                 }
             },
             {
-                $unwind: "$serviceCategory"
-
+                "$unwind": "$categoryData"
             },
             {
-                $project: {
-                    _id: 1,
-                    date: 1,
-                    odometerReading: 1,
-                    totalCost: 1,
-                    note: 1,
+                "$addFields": {
+                    "inDetail.category": "$categoryData"
+                }
+            },
+            {
+                "$group": {
+                    "_id": {
+                        "serviceId": "$_id",
+                        "categoryId": "$inDetail.category._id"
+                    },
+                    "user": { "$first": "$user" },
+                    "date": { "$first": "$date" },
+                    "odometerReading": { "$first": "$odometerReading" },
+                    "totalCost": { "$first": "$totalCost" },
+                    "note": { "$first": "$note" },
+                    "__v": { "$first": "$__v" },
+                    "category": { "$first": "$inDetail.category" },
+                    "items": {
+                        "$push": {
+                            "item": "$inDetail.item",
+                            "price": "$inDetail.price"
+                        }
+                    },
+                    "sumPrice": { "$sum": "$inDetail.price" }
+                }
+            },
+            {
+                "$group": {
+                    "_id": "$_id.serviceId",
+                    "date": { "$first": "$date" },
+                    "odometerReading": { "$first": "$odometerReading" },
                     "inDetail": {
-                        item: "$inDetail.item",
-                        cost: "$inDetail.price",
-                        categoryName: "serviceCategory.name",
+                        "$push": {
+                            "category": "$category.name",
+                            "sumPrice": "$sumPrice"
+                        }
                     }
                 }
+            },
+            {
+                "$sort": { "date": -1 }
             }
+
         ])
+
 
         if (servicesFromDb.length == 0) return { statusCode: 409, message: "No service history found" }
 
