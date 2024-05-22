@@ -364,6 +364,7 @@ exports.getFuelLog = async ({ userId }) => {
         let finalArray = [];
 
         for (let i = 0; i < fuelDataFromDb.length; i++) {
+            //console.log(fuelDataFromDb)
             let obj = {};
             obj.distance = fuelDataFromDb[i].odometerReading - fuelDataFromDb[i + 1]?.odometerReading || null;
             obj.mileage = (obj.distance / fuelDataFromDb[i].volume).toFixed(2);
