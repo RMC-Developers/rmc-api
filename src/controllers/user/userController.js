@@ -1,6 +1,7 @@
 
 const {signup,signin,getUser,sendOTPToUser,signinWithOTP,fillProfileData,getUserProfileData} = require('../../services/auth/user');
-const {addServiceEntry,addFuelEntry,efficiencyCalculator,getServiceCategories,getServiceLog,getFuelLog,fuelReport, fuelEfficiencyReport} = require('../../services/general/general');
+const {addServiceEntry,addFuelEntry,efficiencyCalculator,getServiceCategories,getServiceRateSplitUp,
+  getServiceLog,getFuelLog,fuelReport, fuelEfficiencyReport,getServiceConsumptionReport} = require('../../services/general/general');
 
 exports.signin = async (req, res, next) => {
     try {
@@ -117,6 +118,28 @@ exports.signin = async (req, res, next) => {
     try {
       const response = await fuelReport(req.body);
       res.status(response.statusCode).send({message:response.message,fuelReport:response.consumptionReport});
+    } catch (error) {
+      const err = new Error(error.message);
+      next(err);
+    }
+  };
+
+
+  
+  exports.getServiceConsumptionReport = async(req, res, next) => {
+    try {
+      const response = await getServiceConsumptionReport(req.body);
+      res.status(response.statusCode).send({message:response.message,report:response.report});
+    } catch (error) {
+      const err = new Error(error.message);
+      next(err);
+    }
+  };
+  
+  exports.getServiceRateSplitUp = async(req, res, next) => {
+    try {
+      const response = await getServiceRateSplitUp(req.body);
+      res.status(response.statusCode).send({message:response.message,report:response.report});
     } catch (error) {
       const err = new Error(error.message);
       next(err);

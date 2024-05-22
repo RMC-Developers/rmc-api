@@ -386,3 +386,99 @@ exports.getFuelLog = async ({ userId }) => {
         throw error;
     }
 }
+
+exports.getServiceConsumptionReport = async ({ userId }) => {
+    try {
+
+        const serviceDataFromDb = await Service.aggregate([
+            {
+                $match: {
+                    user: new ObjectId(userId),
+                }
+            },
+            {
+                $group:{
+                    _id:null,
+                    totalServices:{$sum:1},
+                    totalServiceCost:{$sum:'$totalCost'}
+                }
+            },
+            {
+                $project:{
+                    _id:0,
+                    totalServiceCost:1,
+                    totalServices:1
+                }
+            }
+           
+
+        ])
+
+        if(serviceDataFromDb.length === 0) return {statusCode:409,message:"No enough data available for calculation"}
+
+        return { statusCode: 200, report: serviceDataFromDb[0] };
+
+
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
+}
+
+exports.getServiceRateSplitUp = async ({ userId }) => {
+    try {
+
+        const serviceDataFromDb = await Service.aggregate([
+            {
+                $match: {
+                    user: new ObjectId(userId),
+                }
+            },
+            {
+                $unwind:'$inDetail'
+
+            },
+            {
+                "$lookup": {
+                    "from": "servicecategories",
+                    "localField": "inDetail.category",
+                    "foreignField": "_id",
+                    "as": "categoryData"
+                }
+            },
+            {
+                "$unwind": "$categoryData"
+            },
+            {
+                "$addFields": {
+                    "inDetail.category": "$categoryData"
+                }
+            },
+            {
+                $group:{
+                    _id:'$inDetail.category._id',
+                    "category": { "$first": "$inDetail.category.name" },
+                    "totalAmount":{"$sum": "$inDetail.price" }
+
+                }
+            },        
+            {
+                $project:{
+                    _id:0,
+                    category:1,
+                    totalAmount:1,
+                    
+                }
+            }
+        ])
+
+        if(serviceDataFromDb.length === 0) return {statusCode:409,message:"No enough data available for calculation"}
+
+        return { statusCode: 200, report: serviceDataFromDb };
+
+
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
+}

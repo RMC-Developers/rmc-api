@@ -1,6 +1,7 @@
 const express = require("express");
 
-const {createFuelEntry,getFuelEfficiencyReport,createServiceEntry,getServiceCategories,getServiceLog,getFuelLog,fuelReport,getFuelEfficiencyReportTest,getUser,fillUserProfile,getUserProfileData} = require('../../controllers/user/userController')
+const {createFuelEntry,getFuelEfficiencyReport,createServiceEntry,getServiceCategories,getServiceLog,getFuelLog,fuelReport,getServiceRateSplitUp,
+    getFuelEfficiencyReportTest,getUser,fillUserProfile,getUserProfileData,getServiceConsumptionReport} = require('../../controllers/user/userController')
 
 const router = express.Router();
 
@@ -18,6 +19,10 @@ router.get('/get-fuel-efficiency-report-test',getFuelEfficiencyReportTest);
 
 router.get('/get-fuel-efficiency-report',getFuelEfficiencyReport);
 router.get('/get-fuel-report',fuelReport);
+
+router.get('/get-service-consumption-report',getServiceConsumptionReport);
+router.get('/get-service-splitup',getServiceRateSplitUp);
+
 
 router.get('/get-service-log',getServiceLog);
 router.get('/get-fuel-log',getFuelLog);
