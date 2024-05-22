@@ -252,43 +252,75 @@ exports.fuelReport = async ({ userId }) => {
 exports.getServiceLog = async ({ userId, page }) => {
     try {
 
+
+
         const servicesFromDb = await Service.aggregate([
             {
                 $match: {
                     user: new ObjectId(userId)
                 }
             },
-            {
-                $unwind: "$inDetail"
 
+            {
+                "$unwind": "$inDetail"
             },
             {
-                $lookup: {
-                    from: "servicecategories",
-                    localField: "inDetail.category",
-                    foreignField: "_id",
-                    as: "serviceCategory"
+                "$lookup": {
+                    "from": "servicecategories",
+                    "localField": "inDetail.category",
+                    "foreignField": "_id",
+                    "as": "categoryData"
                 }
             },
             {
-                $unwind: "$serviceCategory"
-
+                "$unwind": "$categoryData"
             },
             {
-                $project: {
-                    _id: 1,
-                    date: 1,
-                    odometerReading: 1,
-                    totalCost: 1,
-                    note: 1,
+                "$addFields": {
+                    "inDetail.category": "$categoryData"
+                }
+            },
+            {
+                "$group": {
+                    "_id": {
+                        "serviceId": "$_id",
+                        "categoryId": "$inDetail.category._id"
+                    },
+                    "user": { "$first": "$user" },
+                    "date": { "$first": "$date" },
+                    "odometerReading": { "$first": "$odometerReading" },
+                    "totalCost": { "$first": "$totalCost" },
+                    "note": { "$first": "$note" },
+                    "__v": { "$first": "$__v" },
+                    "category": { "$first": "$inDetail.category" },
+                    "items": {
+                        "$push": {
+                            "item": "$inDetail.item",
+                            "price": "$inDetail.price"
+                        }
+                    },
+                    "sumPrice": { "$sum": "$inDetail.price" }
+                }
+            },
+            {
+                "$group": {
+                    "_id": "$_id.serviceId",
+                    "date": { "$first": "$date" },
+                    "odometerReading": { "$first": "$odometerReading" },
                     "inDetail": {
-                        item: "$inDetail.item",
-                        cost: "$inDetail.price",
-                        categoryName: "serviceCategory.name",
+                        "$push": {
+                            "category": "$category.name",
+                            "sumPrice": "$sumPrice"
+                        }
                     }
                 }
+            },
+            {
+                "$sort": { "date": -1 }
             }
+
         ])
+
 
         if (servicesFromDb.length == 0) return { statusCode: 409, message: "No service history found" }
 
@@ -332,6 +364,7 @@ exports.getFuelLog = async ({ userId }) => {
         let finalArray = [];
 
         for (let i = 0; i < fuelDataFromDb.length; i++) {
+            //console.log(fuelDataFromDb)
             let obj = {};
             obj.distance = fuelDataFromDb[i].odometerReading - fuelDataFromDb[i + 1]?.odometerReading || null;
             obj.mileage = (obj.distance / fuelDataFromDb[i].volume).toFixed(2);
@@ -347,6 +380,102 @@ exports.getFuelLog = async ({ userId }) => {
         }
 
         return { statusCode: 200, fuelLog: finalArray }
+
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
+}
+
+exports.getServiceConsumptionReport = async ({ userId }) => {
+    try {
+
+        const serviceDataFromDb = await Service.aggregate([
+            {
+                $match: {
+                    user: new ObjectId(userId),
+                }
+            },
+            {
+                $group:{
+                    _id:null,
+                    totalServices:{$sum:1},
+                    totalServiceCost:{$sum:'$totalCost'}
+                }
+            },
+            {
+                $project:{
+                    _id:0,
+                    totalServiceCost:1,
+                    totalServices:1
+                }
+            }
+           
+
+        ])
+
+        if(serviceDataFromDb.length === 0) return {statusCode:409,message:"No enough data available for calculation"}
+
+        return { statusCode: 200, report: serviceDataFromDb[0] };
+
+
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
+}
+
+exports.getServiceRateSplitUp = async ({ userId }) => {
+    try {
+
+        const serviceDataFromDb = await Service.aggregate([
+            {
+                $match: {
+                    user: new ObjectId(userId),
+                }
+            },
+            {
+                $unwind:'$inDetail'
+
+            },
+            {
+                "$lookup": {
+                    "from": "servicecategories",
+                    "localField": "inDetail.category",
+                    "foreignField": "_id",
+                    "as": "categoryData"
+                }
+            },
+            {
+                "$unwind": "$categoryData"
+            },
+            {
+                "$addFields": {
+                    "inDetail.category": "$categoryData"
+                }
+            },
+            {
+                $group:{
+                    _id:'$inDetail.category._id',
+                    "category": { "$first": "$inDetail.category.name" },
+                    "totalAmount":{"$sum": "$inDetail.price" }
+
+                }
+            },        
+            {
+                $project:{
+                    _id:0,
+                    category:1,
+                    totalAmount:1,
+                    
+                }
+            }
+        ])
+
+        if(serviceDataFromDb.length === 0) return {statusCode:409,message:"No enough data available for calculation"}
+
+        return { statusCode: 200, report: serviceDataFromDb };
+
 
     } catch (error) {
         console.log(error);
