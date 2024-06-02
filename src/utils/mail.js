@@ -34,4 +34,37 @@ exports.sentMail = async(toAddress='samarhamsa@gmail.com',subject='Test',content
 
 }
 
+
+exports.notifiyingAdminAboutTheNewRequest = async(mailContent)=>{
+
+  try {
+    let transporter = nodemailer.createTransport({
+        host: config.MAIL_HOST,
+        port: config.MAIL_PORT,
+        secure: false, // true for 465, false for other ports
+        auth: {
+          user: config.MAIL_USERNAME, // generated ethereal user
+          pass: config.MAIL_PASSWORD, // generated ethereal password
+        },
+      });
+      // send mail with defined transport object
+      let info = await transporter.sendMail({
+        from: config.MAIL_USERNAME, // sender address
+        to:"phinahasphilip2022@cs.ajce.in", // list of receivers
+        subject:"Join Request", // Subject line
+        html:mailContent, // html body
+      });
+
+      console.log(info)
+    
+      return; 
+
+    
+} catch (error) {
+    console.log(error);
+    throw error
+}
+
+
+}
  
