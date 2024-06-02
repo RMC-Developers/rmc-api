@@ -3,8 +3,8 @@ const ObjectId = require("mongoose").Types.ObjectId;
 const User = require('../../models/User');
 
 const { JWT_SECRET_KEY } = require('../../configurations/constants');
-const { GenerateOTP } = require('../../utils/common');
-const { sentMail } = require('../../utils/mail')
+const { GenerateOTP,createRequestAcceptOrDeclineContent } = require('../../utils/common');
+const { sentMail,notifiyingAdminAboutTheNewRequest } = require('../../utils/mail')
 
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
@@ -78,9 +78,11 @@ exports.signinWithOTP = async ({ email, otp }) => {
 exports.sendOTPToUser = async ({ email }) => {
     try {
 
-        const userFromDb = await User.findOne({ email: email }, { email: 1, name: 1 });
+        const userFromDb = await User.findOne({ email: email }, { email: 1, name: 1, adminVerified:1 });
 
         if (!userFromDb) return { statusCode: 409, message: "Please register first !!" }
+
+        if(userFromDb.adminVerified != true) return { statusCode: 409, message: "Please contact admin for verificaton" }
 
         const OTP = GenerateOTP();
 
@@ -126,6 +128,45 @@ exports.signup = async ({ name, email, password }) => {
         throw error;
     }
 }
+
+
+exports.signupThroughForm = async ({ name, email }) => {
+    try {
+
+        const userFromDb = await User.findOne({ email: email });
+
+        if (userFromDb)
+            return { statusCode: 409, message: "User already exists" }
+
+        const hashedPassword = await bcrypt.hash("123", 12);
+
+
+        const userObj = User({
+            name: name,
+            email: email,
+            password: hashedPassword
+        })
+
+        let res = await userObj.save();
+
+        let mailContent = createRequestAcceptOrDeclineContent(res.name,res._id);
+
+        
+        console.log(mailContent);
+        await notifiyingAdminAboutTheNewRequest(mailContent);
+
+        
+        return { statusCode: 200, message: "User Created" };
+
+
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
+}
+
+
+
 
 exports.userVerification = async ({ userId }) => {
     try {
@@ -200,6 +241,22 @@ exports.getUserProfileData = async({userId})=>{
         const userFromDb = await User.findById(userId,{password:0,otp:0,__v:0});
         if(! userFromDb) return {statusCode:409,message:`User not found`}
         return {statusCode:200,profileData:userFromDb}
+        
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
+}
+
+
+exports.validateUserRequest = async({userId,state})=>{
+    try {
+
+        let res = await User.updateOne({_id: new ObjectId(userId)},{$set:{adminVerified: state}});
+        console.log(res)
+        return;
+
+
         
     } catch (error) {
         console.log(error);

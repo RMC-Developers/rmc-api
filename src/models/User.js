@@ -17,7 +17,6 @@ const userSchema = new Schema({
 
   password: {
     type: Schema.Types.String,
-    required: true,
   },
 
   otp:{
@@ -43,6 +42,11 @@ const userSchema = new Schema({
     pucUpto:Schema.Types.Date,
     fitnessUpto:Schema.Types.Date,
     taxUpto:Schema.Types.Date
+  },
+
+  adminVerified:{
+    type:Schema.Types.Boolean,
+    default:false,
   }
 
 });
