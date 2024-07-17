@@ -20,6 +20,10 @@ const doc = {
 const outputFile = './swagger-output.json';
 const routes = ['./src/server.js'];
 
+const options = {
+  customCss: '.swagger-ui .topbar { display: none }'
+}
 
 
-swaggerAutogen(outputFile, routes, doc);
+
+swaggerAutogen(outputFile, routes, doc,options);
