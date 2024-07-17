@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon src/server.js",
+    "start": "node swagger.js && nodemon src/server.js",
     "start:dev": "copy .env.dev .env && nodemon src/server.js"
   },
   "author": "",
@@ -21,6 +21,8 @@
     "moment-timezone": "^0.5.45",
     "mongoose": "^7.5.3",
     "nodemailer": "^6.9.13",
-    "nodemon": "^3.0.1"
+    "nodemon": "^3.0.1",
+    "swagger-autogen": "^2.23.7",
+    "swagger-ui-express": "^5.0.1"
   }
 }

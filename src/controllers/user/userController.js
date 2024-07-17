@@ -194,8 +194,8 @@ exports.signin = async (req, res, next) => {
       req.body.userId = req.query.userId;
       req.body.state = req.query.state;
 
-      await validateUserRequest(req.body);
-      res.status(200).send({message:"ok"})
+      let response = await validateUserRequest(req.body);
+      res.status(response.message).send({message:response.message})
 
       
     } catch (error) {

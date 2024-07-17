@@ -253,8 +253,7 @@ exports.validateUserRequest = async({userId,state})=>{
     try {
 
         let res = await User.updateOne({_id: new ObjectId(userId)},{$set:{adminVerified: state}});
-        console.log(res)
-        return;
+        return {status:200,message:"Verification completed successfully"};
 
 
         
