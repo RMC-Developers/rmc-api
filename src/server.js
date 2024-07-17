@@ -19,7 +19,7 @@ server.use(cors());
 server.use("/v1/",indexRoutes);
 
 // swagger api doc
-server.use('/doc', swaggerUi.serve, swaggerUi.setup(swaggerFile))
+server.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerFile))
 
 //Handling invalid api request
 server.use((req, res, next) => {
