@@ -28,7 +28,9 @@ const userSchema = new Schema({
     phone:Schema.Types.Number,
     whatsappNumber:Schema.Types.Number,
     bloodGroup:Schema.Types.String,
-    willingToDonate:Schema.Types.Boolean
+    willingToDonate:Schema.Types.Boolean,
+    address:Schema.Types.String,
+    pincode:Schema.Types.Number
   },
 
   vehicleDetails:{

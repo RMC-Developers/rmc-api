@@ -4,7 +4,8 @@ const User = require('../../models/User');
 
 const { JWT_SECRET_KEY } = require('../../configurations/constants');
 const { GenerateOTP,createRequestAcceptOrDeclineContent } = require('../../utils/common');
-const { sentMail,notifiyingAdminAboutTheNewRequest } = require('../../utils/mail')
+const { sentMail,notifiyingAdminAboutTheNewRequest } = require('../../utils/mail');
+const {joinRequestContent} = require('../../helpers/contentMaker');
 
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
@@ -107,8 +108,11 @@ exports.signup = async ({ name, email, password }) => {
 
         const userFromDb = await User.findOne({ email: email });
 
-        if (userFromDb)
+        if (userFromDb && userFromDb.adminVerified)
             return { statusCode: 409, message: "User already exists" }
+
+        if(userFromDb && userFromDb.adminVerified != true)
+            return { statusCode: 409, message: "Contact admin for verification"} 
 
         const hashedPassword = await bcrypt.hash(password, 12);
 
@@ -130,33 +134,38 @@ exports.signup = async ({ name, email, password }) => {
 }
 
 
-exports.signupThroughForm = async ({ name, email }) => {
+exports.signupThroughForm = async ({ name, email, phoneNumber, whatsappNumber, address, pincode }) => {
     try {
 
         const userFromDb = await User.findOne({ email: email });
 
-        if (userFromDb)
+        if (userFromDb && userFromDb.adminVerified)
             return { statusCode: 409, message: "User already exists" }
 
-        const hashedPassword = await bcrypt.hash("123", 12);
+        if(userFromDb && userFromDb.adminVerified != true)
+            return { statusCode: 409, message: "Contact admin for verification"} 
 
 
-        const userObj = User({
+
+        const userObj = new User({
             name: name,
             email: email,
-            password: hashedPassword
+            personalDetails:{
+                phone:phoneNumber,
+                whatsappNumber:whatsappNumber,
+                address:address,
+                pincode:pincode
+            }
+           
         })
 
-        let res = await userObj.save();
+        let userCreated = await userObj.save();
+        console.log(userCreated);
 
-        let mailContent = createRequestAcceptOrDeclineContent(res.name,res._id);
+        let content = joinRequestContent({name:name,email:email,phone:phoneNumber,whatsapp:whatsappNumber,userId:userCreated._id});
+        await notifiyingAdminAboutTheNewRequest(content);
 
-        
-        console.log(mailContent);
-        await notifiyingAdminAboutTheNewRequest(mailContent);
-
-        
-        return { statusCode: 200, message: "User Created" };
+        return { statusCode: 200, message: "Join request submitted, See you on club !!" };
 
 
     } catch (error) {

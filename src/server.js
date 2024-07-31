@@ -36,7 +36,7 @@ server.use((error, req, res, next) => {
   const statusCode = error.status || 500;
   const message = error.message;
   console.log(error);
-  res.status(statusCode).json({ data: { message } });
+  res.status(statusCode).json({ message});
 });
 
   dbConnnection.dbConnection.then(()=>{
