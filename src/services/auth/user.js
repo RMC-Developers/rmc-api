@@ -274,7 +274,7 @@ exports.validateUserRequest = async ({ userId, state }) => {
 
         let userFromDb = await User.findById(userId,{name:1,email:1});
 
-        let mailContent = notifyCustomerAboutAdminApprovel(userFromDb.name);
+        let mailContent = notifyCustomerAboutAdminApprovel({name:userFromDb.name});
 
         await sentMail({toAddress:userFromDb.email,subject:'Thank You for Joining RitzMotoClub!',content:mailContent});
 

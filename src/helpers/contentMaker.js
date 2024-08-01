@@ -43,28 +43,28 @@ exports.joinRequestContent = ({ name, email, phone, whatsapp, userId }) => {
 
 exports.notifyCustomerAboutAdminApprovel = ({ name }) => {
 
-    let content = ` Dear ${name} <br/>
+    let content = ` Dear ${name} <br/><br/><br/>
 
 Welcome to the RMC!
 We're excited to have you as a member of RitzMotoClub, the premier community for Maruti Ritz enthusiasts. Your registration has been successfully completed, and we can't wait to share our passion for the Maruti Ritz with you.
-
-What's Next?
+<br/><br/>
+What's Next?<br/>
 Exclusive Content: As a member, you'll get access to exclusive content, tips, and resources.
 Community Engagement: Connect with fellow members, share your experiences, and join discussions in our WhatsApp Group.
 Special Events: Be the first to know about our upcoming events, meetups.
 Member Benefits: Enjoy special discounts, promotions, and offers from our partners.
-
-Stay Connected
+<br/><br/>
+Stay Connected<br/>
 Make sure to follow us on social media and check your email for the latest updates and announcements.
-
-Facebook: https://www.facebook.com/rmc.ritzmotoclub
-Instagram: https://www.instagram.com/_ritzmotoclub_/
-WhatsApp Channel: https://whatsapp.com/channel/0029Va9yQkS2UPBLU1ScUF3b
+<br/><br/>
+Facebook: https://www.facebook.com/rmc.ritzmotoclub<br/><br/>
+Instagram: https://www.instagram.com/_ritzmotoclub_/<br/><br/>
+WhatsApp Channel: https://whatsapp.com/channel/0029Va9yQkS2UPBLU1ScUF3b<br/><br/>
 
 If you have any questions or need assistance, feel free to contact us at hello@ritzmotoclub.com
-
+<br/><br/>
 Thank you for joining RitzMotoClub. We're thrilled to have you with us on this exciting journey!
-
+<br/><br/>
 Happy Driving!
     `
 
