@@ -25,6 +25,7 @@ exports.signin = async (req, res, next) => {
 
   exports.formSignup = async (req, res, next) => {
     try {
+      console.log(req.body);
       const response = await signupThroughForm(req.body);
       res.status(response.statusCode).send({message:response.message});
     } catch (error) {

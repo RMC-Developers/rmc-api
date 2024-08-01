@@ -2,7 +2,7 @@ const nodemailer = require("nodemailer");
 
 const config = require('../configurations/constants')
 
-exports.sentMail = async(toAddress='samarhamsa@gmail.com',subject='Test',content=`This is a test message`)=>{
+exports.sentMail = async({toAddress='samarhamsa@gmail.com',subject='Test',content=`This is a test message`})=>{
 
     try {
         let transporter = nodemailer.createTransport({

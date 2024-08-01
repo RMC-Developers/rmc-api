@@ -3,9 +3,9 @@ const ObjectId = require("mongoose").Types.ObjectId;
 const User = require('../../models/User');
 
 const { JWT_SECRET_KEY } = require('../../configurations/constants');
-const { GenerateOTP,createRequestAcceptOrDeclineContent } = require('../../utils/common');
-const { sentMail,notifiyingAdminAboutTheNewRequest } = require('../../utils/mail');
-const {joinRequestContent} = require('../../helpers/contentMaker');
+const { GenerateOTP, createRequestAcceptOrDeclineContent } = require('../../utils/common');
+const { sentMail, notifiyingAdminAboutTheNewRequest } = require('../../utils/mail');
+const { joinRequestContent,notifyCustomerAboutAdminApprovel } = require('../../helpers/contentMaker');
 
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
@@ -79,11 +79,11 @@ exports.signinWithOTP = async ({ email, otp }) => {
 exports.sendOTPToUser = async ({ email }) => {
     try {
 
-        const userFromDb = await User.findOne({ email: email }, { email: 1, name: 1, adminVerified:1 });
+        const userFromDb = await User.findOne({ email: email }, { email: 1, name: 1, adminVerified: 1 });
 
         if (!userFromDb) return { statusCode: 409, message: "Please register first !!" }
 
-        if(userFromDb.adminVerified != true) return { statusCode: 409, message: "Please contact admin for verificaton" }
+        if (userFromDb.adminVerified != true) return { statusCode: 409, message: "Please contact admin for verificaton" }
 
         const OTP = GenerateOTP();
 
@@ -111,8 +111,8 @@ exports.signup = async ({ name, email, password }) => {
         if (userFromDb && userFromDb.adminVerified)
             return { statusCode: 409, message: "User already exists" }
 
-        if(userFromDb && userFromDb.adminVerified != true)
-            return { statusCode: 409, message: "Contact admin for verification"} 
+        if (userFromDb && userFromDb.adminVerified != true)
+            return { statusCode: 409, message: "Contact admin for verification" }
 
         const hashedPassword = await bcrypt.hash(password, 12);
 
@@ -134,7 +134,7 @@ exports.signup = async ({ name, email, password }) => {
 }
 
 
-exports.signupThroughForm = async ({ name, email, phoneNumber, whatsappNumber, address, pincode }) => {
+exports.signupThroughForm = async ({ name, email, phoneNumber, whatsappNumber, phoneCountryCode, whatsappNumberCountryCode, postOffice, district, state, registrationNumber, variant, address, pincode }) => {
     try {
 
         const userFromDb = await User.findOne({ email: email });
@@ -142,27 +142,36 @@ exports.signupThroughForm = async ({ name, email, phoneNumber, whatsappNumber, a
         if (userFromDb && userFromDb.adminVerified)
             return { statusCode: 409, message: "User already exists" }
 
-        if(userFromDb && userFromDb.adminVerified != true)
-            return { statusCode: 409, message: "Contact admin for verification"} 
+        if (userFromDb && userFromDb.adminVerified != true)
+            return { statusCode: 409, message: "Contact admin for verification" }
 
 
 
         const userObj = new User({
             name: name,
             email: email,
-            personalDetails:{
-                phone:phoneNumber,
-                whatsappNumber:whatsappNumber,
-                address:address,
-                pincode:pincode
+            personalDetails: {
+                phone: phoneNumber,
+                whatsappNumber: whatsappNumber,
+                district: district,
+                postOffice: postOffice,
+                state: state,
+                phoneCountryCode: phoneCountryCode,
+                whatsappNumberCountrCode: whatsappNumberCountryCode,
+                address: address,
+                pincode: pincode
+            },
+            vehicleDetails: {
+                registrationNumber: registrationNumber,
+                variant: variant
             }
-           
+
         })
 
         let userCreated = await userObj.save();
         console.log(userCreated);
 
-        let content = joinRequestContent({name:name,email:email,phone:phoneNumber,whatsapp:whatsappNumber,userId:userCreated._id});
+        let content = joinRequestContent({ name: name, email: email, phone: phoneNumber, whatsapp: whatsappNumber, userId: userCreated._id });
         await notifiyingAdminAboutTheNewRequest(content);
 
         return { statusCode: 200, message: "Join request submitted, See you on club !!" };
@@ -222,7 +231,7 @@ exports.fillProfileData = async ({ userId, name, membershipId, personalDetails, 
                 "personalDetails.bloodGroup": personalDetails?.bloodGroup ?? null,
                 "personalDetails.willingToDonate": personalDetails?.willingToDonate ?? null,
 
-                "vehicleDetails.registrationNumber": vehicleDetails?.registrationNumber  ?? null,
+                "vehicleDetails.registrationNumber": vehicleDetails?.registrationNumber ?? null,
                 "vehicleDetails.colour": vehicleDetails?.colour ?? null,
                 "vehicleDetails.registeredYear": vehicleDetails?.registeredYear ?? null,
                 "vehicleDetails.variant": vehicleDetails?.variant ?? null,
@@ -244,13 +253,13 @@ exports.fillProfileData = async ({ userId, name, membershipId, personalDetails, 
     }
 }
 
-exports.getUserProfileData = async({userId})=>{
+exports.getUserProfileData = async ({ userId }) => {
     try {
 
-        const userFromDb = await User.findById(userId,{password:0,otp:0,__v:0});
-        if(! userFromDb) return {statusCode:409,message:`User not found`}
-        return {statusCode:200,profileData:userFromDb}
-        
+        const userFromDb = await User.findById(userId, { password: 0, otp: 0, __v: 0 });
+        if (!userFromDb) return { statusCode: 409, message: `User not found` }
+        return { statusCode: 200, profileData: userFromDb }
+
     } catch (error) {
         console.log(error);
         throw error;
@@ -258,14 +267,26 @@ exports.getUserProfileData = async({userId})=>{
 }
 
 
-exports.validateUserRequest = async({userId,state})=>{
+exports.validateUserRequest = async ({ userId, state }) => {
     try {
 
-        let res = await User.updateOne({_id: new ObjectId(userId)},{$set:{adminVerified: state}});
-        return {status:200,message:"Verification completed successfully"};
+        let res = await User.updateOne({ _id: new ObjectId(userId) }, { $set: { adminVerified: state } });
+
+        let userFromDb = await User.findById(userId,{name:1,email:1});
+
+        let mailContent = notifyCustomerAboutAdminApprovel(userFromDb.name);
+
+        await sentMail({toAddress:userFromDb.email,subject:'Thank You for Joining RitzMotoClub!',content:mailContent});
 
 
-        
+
+
+
+
+        return { status: 200, message: "Verification completed successfully" };
+
+
+
     } catch (error) {
         console.log(error);
         throw error;

@@ -26,11 +26,17 @@ const userSchema = new Schema({
   personalDetails:{
     dob:Schema.Types.Date,
     phone:Schema.Types.Number,
+    phoneCountryCode:Schema.Types.Number,
     whatsappNumber:Schema.Types.Number,
+    whatsappNumberCountrCode:Schema.Types.Number,
     bloodGroup:Schema.Types.String,
     willingToDonate:Schema.Types.Boolean,
     address:Schema.Types.String,
-    pincode:Schema.Types.Number
+    pincode:Schema.Types.Number,
+    postOffice:Schema.Types.String,
+    district:Schema.Types.String,
+    state:Schema.Types.String,
+
   },
 
   vehicleDetails:{
