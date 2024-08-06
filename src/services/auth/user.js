@@ -171,7 +171,7 @@ exports.signupThroughForm = async ({ name, email, phoneNumber, whatsappNumber, p
         let userCreated = await userObj.save();
         console.log(userCreated);
 
-        let content = joinRequestContent({ name: name, email: email, phone: phoneNumber, whatsapp: whatsappNumber, userId: userCreated._id });
+        let content = joinRequestContent({ name: name, email: email, phone: phoneCountryCode+phoneNumber,registrationNo:registrationNumber, whatsapp: whatsappNumberCountryCode+whatsappNumber,place:postOffice, userId: userCreated._id });
         await notifiyingAdminAboutTheNewRequest(content);
 
         return { statusCode: 200, message: "Join request submitted, See you on club !!" };
