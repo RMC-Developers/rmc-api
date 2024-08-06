@@ -50,10 +50,11 @@ exports.notifiyingAdminAboutTheNewRequest = async(mailContent)=>{
       // send mail with defined transport object
       let info = await transporter.sendMail({
         from: config.MAIL_USERNAME, // sender address
-        to:"join@ritzmotoclub.com", // list of receivers
+        to:"phinahasphilip2022@cs.ajce.in", // list of receivers
         subject:"Join Request", // Subject line
         html:mailContent, // html body
       });
+      // join@ritzmotoclub.com
 
       console.log(info)
     
