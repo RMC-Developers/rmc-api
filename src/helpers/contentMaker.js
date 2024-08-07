@@ -61,7 +61,6 @@ exports.notifyCustomerAboutAdminApprovel = ({ name }) => {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thank You for Joining RitzMotoClub!</title>
 </head>
 <body style="font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f4; color: #333;">
     <table role="presentation" style="max-width: 600px; margin: auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); width: 100%;">
