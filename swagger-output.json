@@ -26,6 +26,16 @@
         }
       }
     },
+    "/v1/admin/list-members": {
+      "get": {
+        "description": "",
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
     "/v1/user/auth/signup": {
       "post": {
         "description": "",
