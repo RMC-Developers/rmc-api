@@ -26,6 +26,16 @@
         }
       }
     },
+    "/v1/admin/create-qr": {
+      "post": {
+        "description": "",
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
     "/v1/admin/list-members": {
       "get": {
         "description": "",
@@ -275,6 +285,16 @@
       }
     },
     "/v1/user/get-fuel-log": {
+      "get": {
+        "description": "",
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/v1/qr/scan": {
       "get": {
         "description": "",
         "responses": {

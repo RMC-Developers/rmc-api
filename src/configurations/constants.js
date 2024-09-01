@@ -8,4 +8,6 @@ module.exports = {
     MAIL_PORT:process.env.MAIL_PORT||587,
     MAIL_USERNAME:process.env.MAIL_USERNAME || 'join@ritzmotoclub.com',
     MAIL_PASSWORD:process.env.MAIL_PASSWORD ||'Browny@2016',
+    SERVER_DOMAIN:'https://rmc-api-phinahas-projects-41da129b.vercel.app'
+
 }
