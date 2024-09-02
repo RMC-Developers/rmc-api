@@ -10,4 +10,8 @@ router.post('/create-qr',adminController.createQRCode);
 
 router.get('/list-members',adminController.listUsers);
 
+router.get('/list-qrs',adminController.listQR);
+
+router.get('/view-a-qr',adminController.viewAQR);
+
 module.exports = router;

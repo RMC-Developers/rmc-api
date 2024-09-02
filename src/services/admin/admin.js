@@ -84,3 +84,31 @@ exports.createQRCode = async ({ }) => {
     }
 
 }
+
+exports.listAllQRs = async ({}) => {
+    try {
+
+        const qrsFromDb = await QR.find({});
+        if(qrsFromDb.length == 0) return {statusCode:409, message:"No data found"}
+
+        return {statusCode:200, qrList:qrsFromDb}
+        
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
+}
+
+exports.viewAParticularQR = async({id})=>{
+    try {
+
+        const qrFromDb = await QR.findById(id);
+        if(!qrFromDb) return {statusCode:409, message:"No qr found in Database"}
+
+        return {statusCode:200, qrCode:qrFromDb}
+    
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
+}
