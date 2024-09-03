@@ -1,4 +1,4 @@
-const {createServiceCategory, getUserList, createQRCode, listAllQRs, viewAParticularQR} = require('../../services/admin/admin')
+const {createServiceCategory, getUserList, createQRCode, listAllQRs, viewAParticularQR, assingMembershipIdToAQr, toggleToLandingPageState} = require('../../services/admin/admin')
 
 
 exports.createServiceCategory = async (req, res, next) => {
@@ -46,6 +46,28 @@ exports.createServiceCategory = async (req, res, next) => {
       req.body.id = req.query.id;
       const response = await viewAParticularQR(req.body);
       res.status(response.statusCode).send({message:response.message, qr:response.qrCode});
+    } catch (error) {
+      const err = new Error(error.message);
+      next(err);
+    }
+  };
+
+  exports.assingMembershipIdToAQr = async (req, res, next) => {
+    try {
+      req.body.id = req.query.id;
+      const response = await assingMembershipIdToAQr(req.body);
+      res.status(response.statusCode).send({message:response.message});
+    } catch (error) {
+      const err = new Error(error.message);
+      next(err);
+    }
+  };
+
+  exports.toggleToLandingPageState = async (req, res, next) => {
+    try {
+      req.body.id = req.query.id;
+      const response = await toggleToLandingPageState(req.body);
+      res.status(response.statusCode).send({message:response.message});
     } catch (error) {
       const err = new Error(error.message);
       next(err);

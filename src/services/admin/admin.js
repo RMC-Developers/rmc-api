@@ -112,3 +112,31 @@ exports.viewAParticularQR = async({id})=>{
         throw error;
     }
 }
+
+exports.assingMembershipIdToAQr = async({qrId,membershipId})=>{
+    try {
+
+        const qrDataFromDb = await QR.find({membershipId:membershipId,deleted:false});
+        if(qrDataFromDb) return {statusCode:409, message:"RMC ID already connected with a QR"}
+        const res = await QR.updateOne({_id:new ObjectId(qrId)},{$set:{membershipId:membershipId}});
+
+        return {statusCode:200,message:"Updated."}
+        
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
+}
+
+exports.toggleToLandingPageState = async({qrId,state})=>{
+    try {
+
+        const res = await QR.updateOne({_id:new ObjectId(qrId)},{$set:{toLandingPage:state}});
+
+        return {statusCode:200,message:"Updated."}
+        
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
+}
