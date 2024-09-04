@@ -76,7 +76,7 @@ exports.createQRCode = async ({ }) => {
             }
         })
 
-        return { statusCode: 200, message: "QR Code created success" }
+        return { statusCode: 200, message: "QR Code created success" }  
 
     } catch (error) {
         console.log(error);
@@ -117,7 +117,20 @@ exports.assingMembershipIdToAQr = async({qrId,membershipId})=>{
     try {
 
         const qrDataFromDb = await QR.find({membershipId:membershipId,deleted:false});
-        if(qrDataFromDb) return {statusCode:409, message:"RMC ID already connected with a QR"}
+        if(qrDataFromDb) return {statusCode:200, alreadyExist:true, message:"RMC ID already connected with a QR"}
+        const res = await QR.updateOne({_id:new ObjectId(qrId)},{$set:{membershipId:membershipId}});
+
+        return {statusCode:200,message:"Updated.",alreadyExist:null}
+        
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
+}
+
+exports.assingMembershipIdToAQrWithAlreadyExistedMembershipId = async({qrId,membershipId})=>{
+    try {
+
         const res = await QR.updateOne({_id:new ObjectId(qrId)},{$set:{membershipId:membershipId}});
 
         return {statusCode:200,message:"Updated."}
@@ -127,6 +140,7 @@ exports.assingMembershipIdToAQr = async({qrId,membershipId})=>{
         throw error;
     }
 }
+
 
 exports.toggleToLandingPageState = async({qrId,state})=>{
     try {

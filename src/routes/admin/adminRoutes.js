@@ -14,8 +14,10 @@ router.get('/list-qrs',adminController.listQR);
 
 router.get('/view-a-qr',adminController.viewAQR);
 
-router.get('/toggle-to-landingpage-state',adminController.toggleToLandingPageState);
+router.post('/toggle-to-landingpage-state',adminController.toggleToLandingPageState);
 
-router.get('/connect-membershipId-with-qr',adminController.assingMembershipIdToAQr);
+router.post('/connect-membershipId-with-qr',adminController.assingMembershipIdToAQr);
+
+router.post('/connect-existing-membershipId-with-qr', adminController.assingMembershipIdToAQrWithAlreadyExistedMembershipId);
 
 module.exports = router;

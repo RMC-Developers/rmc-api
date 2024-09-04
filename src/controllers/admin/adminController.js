@@ -1,4 +1,4 @@
-const {createServiceCategory, getUserList, createQRCode, listAllQRs, viewAParticularQR, assingMembershipIdToAQr, toggleToLandingPageState} = require('../../services/admin/admin')
+const {createServiceCategory, getUserList, createQRCode, listAllQRs, viewAParticularQR, assingMembershipIdToAQr, toggleToLandingPageState, assingMembershipIdToAQrWithAlreadyExistedMembershipId} = require('../../services/admin/admin')
 
 
 exports.createServiceCategory = async (req, res, next) => {
@@ -56,7 +56,7 @@ exports.createServiceCategory = async (req, res, next) => {
     try {
       req.body.id = req.query.id;
       const response = await assingMembershipIdToAQr(req.body);
-      res.status(response.statusCode).send({message:response.message});
+      res.status(response.statusCode).send({message:response.message, alreadyExist:response.alreadyExist});
     } catch (error) {
       const err = new Error(error.message);
       next(err);
@@ -73,3 +73,17 @@ exports.createServiceCategory = async (req, res, next) => {
       next(err);
     }
   };
+
+
+  exports.assingMembershipIdToAQrWithAlreadyExistedMembershipId = async (req, res, next) => {
+    try {
+      req.body.id = req.query.id;
+      const response = await assingMembershipIdToAQrWithAlreadyExistedMembershipId(req.body);
+      res.status(response.statusCode).send({message:response.message});
+    } catch (error) {
+      const err = new Error(error.message);
+      next(err);
+    }
+  };
+
+  
