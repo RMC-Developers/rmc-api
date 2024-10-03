@@ -26,6 +26,16 @@
         }
       }
     },
+    "/v1/admin/assign-membershipid": {
+      "post": {
+        "description": "",
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
     "/v1/admin/create-qr": {
       "post": {
         "description": "",

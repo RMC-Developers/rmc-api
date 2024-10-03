@@ -4,7 +4,7 @@ const ServiceCategory = require('../../models/ServiceCategory');
 const User = require('../../models/User');
 const QR = require('../../models/QR');
 
-const { SERVER_DOMAIN,RMCID_RANGE } = require('../../configurations/constants')
+const { SERVER_DOMAIN,RMCID_RANGE,RMCID_PREFIX } = require('../../configurations/constants')
 
 const qrHelpers = require('../../helpers/qrCode');
 
@@ -70,6 +70,9 @@ exports.getUserList = async ({ }) => {
                     name: 1,
                     membershipId: 1,
                     email: 1,
+                    membershipId:{
+                        $concat:[RMCID_PREFIX,{ $toString: "$membershipId" }]
+                    },
                     whatsapp: {
                         $concat: [{ $toString: "$personalDetails.whatsappNumberCountrCode" }, "", { $toString: "$personalDetails.whatsappNumber" }]
                     },
