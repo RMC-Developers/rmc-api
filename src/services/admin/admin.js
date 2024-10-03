@@ -149,11 +149,12 @@ exports.viewAParticularQR = async({id})=>{
 exports.assingMembershipIdToAQr = async({qrId,membershipId})=>{
     try {
 
-        const qrDataFromDb = await QR.find({membershipId:membershipId,deleted:false});
+        const qrDataFromDb = await QR.findOne({membershipId:membershipId,deleted:false});
+        console.log(qrDataFromDb)
         if(qrDataFromDb) return {statusCode:200, alreadyExist:true, message:"RMC ID already connected with a QR"}
         const res = await QR.updateOne({_id:new ObjectId(qrId)},{$set:{membershipId:membershipId}});
 
-        return {statusCode:200,message:"Updated.",alreadyExist:null}
+        return {statusCode:200,message:"Updated.",alreadyExist:false}
         
     } catch (error) {
         console.log(error);
