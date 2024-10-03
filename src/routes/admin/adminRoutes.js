@@ -6,6 +6,8 @@ const router = express.Router();
 
 router.post('/create-service-category',adminController.createServiceCategory);
 
+router.post('/assign-membershipid',adminController.assingAMembershipIdToAUser)
+
 router.post('/create-qr',adminController.createQRCode);
 
 router.get('/list-members',adminController.listUsers);

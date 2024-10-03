@@ -4,9 +4,42 @@ const ServiceCategory = require('../../models/ServiceCategory');
 const User = require('../../models/User');
 const QR = require('../../models/QR');
 
-const { SERVER_DOMAIN } = require('../../configurations/constants')
+const { SERVER_DOMAIN,RMCID_RANGE } = require('../../configurations/constants')
 
 const qrHelpers = require('../../helpers/qrCode');
+
+
+
+exports.assignAUserWithMembershipID = async ({userId})=>{
+    try {
+
+        //finding last assigned id
+
+        const userFromDb = await User.findById(userId,{membershipId:1});
+        
+        
+        if(userFromDb.membershipId) return {statusCode:409, message:"Conflict, already membership id exist."}
+
+        const lastQRCodeFromDb = await User.find({}).sort({membershipId:-1}).limit(1);
+        let membershipId;
+        if(!lastQRCodeFromDb[0].membershipId){
+            membershipId = RMCID_RANGE;
+        }else{
+
+            membershipId = Number(lastQRCodeFromDb[0].membershipId)+1
+        }
+        
+        await User.updateOne({_id:new ObjectId(userId)},{$set:{membershipId:membershipId}});
+
+        return {statusCode:200,message:"Membership ID assigned"}
+
+        
+        
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
+}
 
 exports.createServiceCategory = async ({ categoryName }) => {
     try {
