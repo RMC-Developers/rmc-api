@@ -2,7 +2,7 @@ const ObjectId = require("mongoose").Types.ObjectId;
 
 const User = require('../../models/User');
 
-const { JWT_SECRET_KEY } = require('../../configurations/constants');
+const { JWT_SECRET_KEY,RMCID_RANGE } = require('../../configurations/constants');
 const { GenerateOTP, createRequestAcceptOrDeclineContent } = require('../../utils/common');
 const { sentMail, notifiyingAdminAboutTheNewRequest } = require('../../utils/mail');
 const { joinRequestContent,notifyCustomerAboutAdminApprovel } = require('../../helpers/contentMaker');
@@ -146,10 +146,19 @@ exports.signupThroughForm = async ({ name, email, phoneNumber, whatsappNumber, p
             return { statusCode: 409, message: "Contact admin for verification" }
 
 
+        const lastQRCodeFromDb = await User.find({}).sort({membershipId:-1}).limit(1);
+        let membershipId;
+        if(!lastQRCodeFromDb[0].membershipId){
+            membershipId = RMCID_RANGE;
+        }else{
+
+            membershipId = Number(lastQRCodeFromDb[0].membershipId)+1
+        }
 
         const userObj = new User({
             name: name,
             email: email,
+            membershipId:membershipId,
             personalDetails: {
                 phone: phoneNumber,
                 whatsappNumber: whatsappNumber,
