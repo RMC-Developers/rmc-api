@@ -6,6 +6,7 @@ const { JWT_SECRET_KEY,RMCID_RANGE } = require('../../configurations/constants')
 const { GenerateOTP, createRequestAcceptOrDeclineContent } = require('../../utils/common');
 const { sentMail, notifiyingAdminAboutTheNewRequest } = require('../../utils/mail');
 const { joinRequestContent,notifyCustomerAboutAdminApprovel } = require('../../helpers/contentMaker');
+const adminServices = require('../admin/admin')
 
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
@@ -146,19 +147,11 @@ exports.signupThroughForm = async ({ name, email, phoneNumber, whatsappNumber, p
             return { statusCode: 409, message: "Contact admin for verification" }
 
 
-        const lastQRCodeFromDb = await User.find({}).sort({membershipId:-1}).limit(1);
-        let membershipId;
-        if(!lastQRCodeFromDb[0].membershipId){
-            membershipId = RMCID_RANGE;
-        }else{
-
-            membershipId = Number(lastQRCodeFromDb[0].membershipId)+1
-        }
+       
 
         const userObj = new User({
             name: name,
             email: email,
-            membershipId:membershipId,
             personalDetails: {
                 phone: phoneNumber,
                 whatsappNumber: whatsappNumber,
@@ -278,6 +271,11 @@ exports.getUserProfileData = async ({ userId }) => {
 
 exports.validateUserRequest = async ({ userId, state }) => {
     try {
+
+        const userFromDbToCheckAlreadyVerified  = await User.findOne({_id:new ObjectId(userId),adminVerified:true}); 
+        if(!userFromDbToCheckAlreadyVerified){
+            await adminServices.assignAUserWithMembershipID({userId:userId})
+        }
 
         let res = await User.updateOne({ _id: new ObjectId(userId) }, { $set: { adminVerified: state } });
 
