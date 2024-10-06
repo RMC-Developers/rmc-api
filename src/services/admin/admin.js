@@ -169,7 +169,7 @@ exports.assingMembershipIdToAQrWithAlreadyExistedMembershipId = async({qrId,memb
     try {
 
         const res = await QR.updateOne({_id:new ObjectId(qrId)},{$set:{membershipId:membershipId}});
-
+        await QR.updateOne({membershipId:membershipId},{$set:{deleted:true}})
         return {statusCode:200,message:"Updated."}
         
     } catch (error) {
