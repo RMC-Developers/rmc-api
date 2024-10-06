@@ -1,9 +1,11 @@
+const {SERVER_DOMAIN} = require('../configurations/constants')
+
 exports.joinRequestContent = ({ name, place,registrationNo, phone, whatsapp, userId }) => {
 
     try {
 
-        let accept_url = `https://rmc-api-phinahas-projects-41da129b.vercel.app/v1/user/general/validate-join-request?state=${true}&userId=${userId}`;
-        let reject_url = `https://rmc-api-phinahas-projects-41da129b.vercel.app/v1/user/general/validate-join-request?state=${false}&userId=${userId}`;
+        let accept_url = `${SERVER_DOMAIN}/v1/user/general/validate-join-request?state=${true}&userId=${userId}`;
+        let reject_url = `${SERVER_DOMAIN}/v1/user/general/validate-join-request?state=${false}&userId=${userId}`;
 
         let htmlContent = `
         <h3>Hi Admin,</h3>
