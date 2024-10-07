@@ -4,37 +4,37 @@ const ServiceCategory = require('../../models/ServiceCategory');
 const User = require('../../models/User');
 const QR = require('../../models/QR');
 
-const { SERVER_DOMAIN,RMCID_RANGE,RMCID_PREFIX } = require('../../configurations/constants')
+const { SERVER_DOMAIN, RMCID_RANGE, RMCID_PREFIX } = require('../../configurations/constants')
 
 const qrHelpers = require('../../helpers/qrCode');
 
 
 
-exports.assignAUserWithMembershipID = async ({userId})=>{
+exports.assignAUserWithMembershipID = async ({ userId }) => {
     try {
 
         //finding last assigned id
 
-        const userFromDb = await User.findById(userId,{membershipId:1});
-        
-        
-        if(userFromDb.membershipId) return {statusCode:409, message:"Conflict, already membership id exist."}
+        const userFromDb = await User.findById(userId, { membershipId: 1 });
 
-        const lastQRCodeFromDb = await User.find({}).sort({membershipId:-1}).limit(1);
+
+        if (userFromDb.membershipId) return { statusCode: 409, message: "Conflict, already membership id exist." }
+
+        const lastQRCodeFromDb = await User.find({}).sort({ membershipId: -1 }).limit(1);
         let membershipId;
-        if(!lastQRCodeFromDb[0].membershipId){
+        if (!lastQRCodeFromDb[0].membershipId) {
             membershipId = RMCID_RANGE;
-        }else{
+        } else {
 
-            membershipId = Number(lastQRCodeFromDb[0].membershipId)+1
+            membershipId = Number(lastQRCodeFromDb[0].membershipId) + 1
         }
-        
-        await User.updateOne({_id:new ObjectId(userId)},{$set:{membershipId:membershipId}});
 
-        return {statusCode:200,message:"Membership ID assigned"}
+        await User.updateOne({ _id: new ObjectId(userId) }, { $set: { membershipId: membershipId } });
 
-        
-        
+        return { statusCode: 200, message: "Membership ID assigned" }
+
+
+
     } catch (error) {
         console.log(error);
         throw error;
@@ -70,8 +70,8 @@ exports.getUserList = async ({ }) => {
                     name: 1,
                     membershipId: 1,
                     email: 1,
-                    membershipId:{
-                        $concat:[RMCID_PREFIX,{ $toString: "$membershipId" }]
+                    membershipId: {
+                        $concat: [RMCID_PREFIX, { $toString: "$membershipId" }]
                     },
                     whatsapp: {
                         $concat: [{ $toString: "$personalDetails.whatsappNumberCountrCode" }, "", { $toString: "$personalDetails.whatsappNumber" }]
@@ -112,7 +112,7 @@ exports.createQRCode = async ({ }) => {
             }
         })
 
-        return { statusCode: 200, message: "QR Code created success" }  
+        return { statusCode: 200, message: "QR Code created success" }
 
     } catch (error) {
         console.log(error);
@@ -121,57 +121,126 @@ exports.createQRCode = async ({ }) => {
 
 }
 
-exports.listAllQRs = async ({}) => {
+exports.listAllQRs = async ({ }) => {
     try {
 
         const qrsFromDb = await QR.find({});
-        if(qrsFromDb.length == 0) return {statusCode:409, message:"No data found"}
+        /**
+         * 
+         
+        const qrsFromDb = await QR.aggregate([
+            {
+                $lookup:{
+                    from:"users",
+                    localField:"membershipId",
+                    foreignField:"membershipId",
+                    as:"user"
+                }
+            },
+            {
+                $unwind:"$user"
+            },
+            {
+                $project:{
+                    _id:1,
+                    id:1,
+                    membershipId:1,
+                    qrCode:1,
+                    toLandingPage:1,
+                    deleted:1,
+                    "user.name":1
+                }
+            }
+        ])
+            */
+        if (qrsFromDb.length == 0) return { statusCode: 409, message: "No data found" }
 
-        return {statusCode:200, qrList:qrsFromDb}
-        
+        return { statusCode: 200, qrList: qrsFromDb }
+
     } catch (error) {
         console.log(error);
         throw error;
     }
 }
 
-exports.viewAParticularQR = async({id})=>{
+exports.viewAParticularQR = async ({ id }) => {
     try {
 
         const qrFromDb = await QR.findById(id);
-        if(!qrFromDb) return {statusCode:409, message:"No qr found in Database"}
+        if (!qrFromDb) return { statusCode: 409, message: "No qr found in Database" }
 
-        return {statusCode:200, qrCode:qrFromDb}
-    
+        return { statusCode: 200, qrCode: qrFromDb }
+
     } catch (error) {
         console.log(error);
         throw error;
     }
 }
 
-exports.assingMembershipIdToAQr = async({qrId,membershipId})=>{
+exports.viewAParticularUser = async({userId})=>{
     try {
 
-        const qrDataFromDb = await QR.findOne({membershipId:membershipId,deleted:false});
+        const userFromDb = await User.aggregate([
+            {
+                $match:{
+                    _id:new ObjectId(userId)
+                }
+            },
+            {
+                $project:{
+                    name:1,
+                    adminVerified:1,
+                    membershipId:1,
+                    email:1,
+                    registrationNumber:{
+                        $concat:["$vehicleDetails.registrationNumber",""]
+                    },
+                    vechileVariant:{
+                        $concat:["$vehicleDetails.variant",""]
+                    },
+                    whatsapp: {
+                        $concat: [{ $toString: "$personalDetails.whatsappNumberCountrCode" }, "", { $toString: "$personalDetails.whatsappNumber" }]
+                    },
+                    phone: {
+                        $concat: [{ $toString: "$personalDetails.phoneCountryCode" }, { $toString: "$personalDetails.phone" }]
+                    },
+                    address: {
+                        $concat: ["$personalDetails.address", "$personalDetails.postOffice", { $toString: "$personalDetails.pincode" }, "", ",", "$personalDetails.district", "$personalDetails.state"]
+                    },
+                }
+            }
+        ])
+        if(userFromDb.length == 0) return {statusCode:409,message:"No data found."}
+        return{statusCode:200,user:userFromDb[0]}        
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
+}
+
+exports.assingMembershipIdToAQr = async ({ qrId, membershipId }) => {
+    try {
+
+        const qrDataFromDb = await QR.findOne({ membershipId: membershipId, deleted: false });
         console.log(qrDataFromDb)
-        if(qrDataFromDb) return {statusCode:200, alreadyExist:true, message:"RMC ID already connected with a QR"}
-        const res = await QR.updateOne({_id:new ObjectId(qrId)},{$set:{membershipId:membershipId}});
+        if (qrDataFromDb) return { statusCode: 200, alreadyExist: true, message: "RMC ID already connected with a QR" }
+        const res = await QR.updateOne({ _id: new ObjectId(qrId) }, { $set: { membershipId: membershipId } });
 
-        return {statusCode:200,message:"Updated.",alreadyExist:false}
-        
+        return { statusCode: 200, message: "Updated.", alreadyExist: false }
+
     } catch (error) {
         console.log(error);
         throw error;
     }
 }
 
-exports.assingMembershipIdToAQrWithAlreadyExistedMembershipId = async({qrId,membershipId})=>{
+exports.assingMembershipIdToAQrWithAlreadyExistedMembershipId = async ({ qrId, membershipId }) => {
     try {
 
-        const res = await QR.updateOne({_id:new ObjectId(qrId)},{$set:{membershipId:membershipId}});
-        await QR.updateOne({membershipId:membershipId},{$set:{deleted:true}})
-        return {statusCode:200,message:"Updated."}
-        
+        const res = await QR.updateOne({ _id: new ObjectId(qrId) }, { $set: { membershipId: membershipId } });
+        await QR.updateOne({ membershipId: membershipId }, { $set: { deleted: true } })
+        return { statusCode: 200, message: "Updated." }
+
     } catch (error) {
         console.log(error);
         throw error;
@@ -179,13 +248,13 @@ exports.assingMembershipIdToAQrWithAlreadyExistedMembershipId = async({qrId,memb
 }
 
 
-exports.toggleToLandingPageState = async({qrId,state})=>{
+exports.toggleToLandingPageState = async ({ qrId, state }) => {
     try {
 
-        const res = await QR.updateOne({_id:new ObjectId(qrId)},{$set:{toLandingPage:state}});
+        const res = await QR.updateOne({ _id: new ObjectId(qrId) }, { $set: { toLandingPage: state } });
 
-        return {statusCode:200,message:"Updated."}
-        
+        return { statusCode: 200, message: "Updated." }
+
     } catch (error) {
         console.log(error);
         throw error;

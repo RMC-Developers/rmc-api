@@ -55,6 +55,10 @@ const userSchema = new Schema({
   adminVerified:{
     type:Schema.Types.Boolean,
     default:false,
+  },
+  deleted:{
+    type:Schema.Types.Boolean,
+    default:false,
   }
 
 });

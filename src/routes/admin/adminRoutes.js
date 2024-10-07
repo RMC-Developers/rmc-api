@@ -16,6 +16,8 @@ router.get('/list-qrs',adminController.listQR);
 
 router.get('/view-a-qr',adminController.viewAQR);
 
+router.get('/view-a-member',adminController.viewAUser);
+
 router.post('/toggle-to-landingpage-state',adminController.toggleToLandingPageState);
 
 router.post('/connect-membershipId-with-qr',adminController.assingMembershipIdToAQr);
