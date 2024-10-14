@@ -85,6 +85,25 @@
         }
       }
     },
+    "/v1/admin/view-a-member": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
     "/v1/admin/toggle-to-landingpage-state": {
       "post": {
         "description": "",

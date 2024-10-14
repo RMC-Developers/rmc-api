@@ -124,35 +124,43 @@ exports.createQRCode = async ({ }) => {
 exports.listAllQRs = async ({ }) => {
     try {
 
-        const qrsFromDb = await QR.find({});
-        /**
-         * 
-         
+        //const qrsFromDb = await QR.find({});
+        
         const qrsFromDb = await QR.aggregate([
             {
-                $lookup:{
-                    from:"users",
-                    localField:"membershipId",
-                    foreignField:"membershipId",
-                    as:"user"
+                $addFields: {
+                    membershipIdNumber: { $toInt: "$membershipId" }
                 }
             },
             {
-                $unwind:"$user"
+                $lookup: {
+                    from: "users",
+                    localField: "membershipIdNumber",
+                    foreignField: "membershipId",
+                    as: "user"
+                }
             },
             {
-                $project:{
-                    _id:1,
-                    id:1,
-                    membershipId:1,
-                    qrCode:1,
-                    toLandingPage:1,
-                    deleted:1,
-                    "user.name":1
+                $unwind: {
+                    path: "$user",
+                    preserveNullAndEmptyArrays: true // Include QR records even if no matching user
+                }
+            },
+            {
+                $project: {
+                    _id: 1,
+                    id: 1,
+                    membershipId: 1,
+                    qrCode: 1,
+                    toLandingPage: 1,
+                    deleted: 1,
+                    "user.name": 1
                 }
             }
-        ])
-            */
+        ]);
+        
+
+        
         if (qrsFromDb.length == 0) return { statusCode: 409, message: "No data found" }
 
         return { statusCode: 200, qrList: qrsFromDb }
