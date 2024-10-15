@@ -125,7 +125,7 @@ exports.listAllQRs = async ({ }) => {
     try {
 
         //const qrsFromDb = await QR.find({});
-        
+
         const qrsFromDb = await QR.aggregate([
             {
                 $addFields: {
@@ -158,9 +158,9 @@ exports.listAllQRs = async ({ }) => {
                 }
             }
         ]);
-        
 
-        
+
+
         if (qrsFromDb.length == 0) return { statusCode: 409, message: "No data found" }
 
         return { statusCode: 200, qrList: qrsFromDb }
@@ -185,26 +185,49 @@ exports.viewAParticularQR = async ({ id }) => {
     }
 }
 
-exports.viewAParticularUser = async({userId})=>{
+exports.viewAParticularUser = async ({ userId }) => {
     try {
 
         const userFromDb = await User.aggregate([
             {
-                $match:{
-                    _id:new ObjectId(userId)
+                $match: {
+                    _id: new ObjectId(userId)
                 }
             },
             {
-                $project:{
-                    name:1,
-                    adminVerified:1,
-                    membershipId:1,
-                    email:1,
-                    registrationNumber:{
-                        $concat:["$vehicleDetails.registrationNumber",""]
+                $addFields: {
+                    membershipIdString: { $toString: "$membershipId" }
+                }
+            },
+            {
+                $lookup: {
+                    from: 'qrs',
+                    localField: 'membershipIdString',
+                    foreignField: 'membershipId',
+                    as: 'qr'
+                }
+
+            },
+            {
+                $unwind: {
+                    path: '$qr',
+                    preserveNullAndEmptyArrays: true // Include QR records even if no matching user
+
+                }
+            },
+            {
+                $project: {
+                    name: 1,
+                    adminVerified: 1,
+                    membershipId: 1,
+                    email: 1,
+                    "qr._id": 1,
+                    "qr.qrCode": 1,
+                    registrationNumber: {
+                        $concat: ["$vehicleDetails.registrationNumber", ""]
                     },
-                    vechileVariant:{
-                        $concat:["$vehicleDetails.variant",""]
+                    vechileVariant: {
+                        $concat: ["$vehicleDetails.variant", ""]
                     },
                     whatsapp: {
                         $concat: [{ $toString: "$personalDetails.whatsappNumberCountrCode" }, "", { $toString: "$personalDetails.whatsappNumber" }]
@@ -213,13 +236,13 @@ exports.viewAParticularUser = async({userId})=>{
                         $concat: [{ $toString: "$personalDetails.phoneCountryCode" }, { $toString: "$personalDetails.phone" }]
                     },
                     address: {
-                        $concat: ["$personalDetails.address", "$personalDetails.postOffice", { $toString: "$personalDetails.pincode" }, "", ",", "$personalDetails.district", "$personalDetails.state"]
+                        $concat: ["$personalDetails.address", " ", "$personalDetails.postOffice", " ", { $toString: "$personalDetails.pincode" }, "", ",", "$personalDetails.district", " ", "$personalDetails.state"]
                     },
                 }
             }
         ])
-        if(userFromDb.length == 0) return {statusCode:409,message:"No data found."}
-        return{statusCode:200,user:userFromDb[0]}        
+        if (userFromDb.length == 0) return { statusCode: 409, message: "No data found." }
+        return { statusCode: 200, user: userFromDb[0] }
     } catch (error) {
         console.log(error);
         throw error;
