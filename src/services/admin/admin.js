@@ -70,6 +70,9 @@ exports.getUserList = async ({ }) => {
                     name: 1,
                     membershipId: 1,
                     email: 1,
+                    registrationNumber: {
+                        $concat: ["$vehicleDetails.registrationNumber", ""]
+                    },
                     membershipId: {
                         $concat: [RMCID_PREFIX, { $toString: "$membershipId" }]
                     },
@@ -80,7 +83,8 @@ exports.getUserList = async ({ }) => {
                         $concat: [{ $toString: "$personalDetails.phoneCountryCode" }, { $toString: "$personalDetails.phone" }]
                     },
                     address: {
-                        $concat: ["$personalDetails.address", "$personalDetails.postOffice", { $toString: "$personalDetails.pincode" }, "", ",", "$personalDetails.district", "$personalDetails.state"]
+                        $concat: ["$personalDetails.address",","," ", "$personalDetails.postOffice", ","," ", "$personalDetails.district",","," ", "$personalDetails.state",","," ", { $toString: "$personalDetails.pincode" }]
+                        
                     },
                     adminVerified: 1
                 }
@@ -236,7 +240,8 @@ exports.viewAParticularUser = async ({ userId }) => {
                         $concat: [{ $toString: "$personalDetails.phoneCountryCode" }, { $toString: "$personalDetails.phone" }]
                     },
                     address: {
-                        $concat: ["$personalDetails.address", " ", "$personalDetails.postOffice", " ", { $toString: "$personalDetails.pincode" }, "", ",", "$personalDetails.district", " ", "$personalDetails.state"]
+                        $concat: ["$personalDetails.address", ",", " ", "$personalDetails.postOffice", ",", " ", "$personalDetails.district", ",", " ", "$personalDetails.state", ",", " ", { $toString: "$personalDetails.pincode" }]
+
                     },
                 }
             }
