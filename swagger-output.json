@@ -203,27 +203,7 @@
         }
       }
     },
-    "/v1/user/auth/signup": {
-      "post": {
-        "description": "",
-        "responses": {
-          "default": {
-            "description": ""
-          }
-        }
-      }
-    },
     "/v1/user/auth/form-signup": {
-      "post": {
-        "description": "",
-        "responses": {
-          "default": {
-            "description": ""
-          }
-        }
-      }
-    },
-    "/v1/user/auth/signin": {
       "post": {
         "description": "",
         "responses": {

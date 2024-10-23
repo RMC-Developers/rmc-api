@@ -93,7 +93,7 @@ exports.sendOTPToUser = async ({ email }) => {
 
         let emailContent = `Hi ${userFromDb.name}. Your OTP for RMC login is ${OTP}`;
 
-        await sentMail(userFromDb.email, 'RMC OTP', emailContent);
+        await sentMail({toAddress:userFromDb.email, subject:'RMC OTP', content:emailContent});
 
         return { statusCode: 200, message: "Please check you mail box for RMC login OTP" }
 
