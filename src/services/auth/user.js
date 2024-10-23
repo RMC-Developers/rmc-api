@@ -52,7 +52,7 @@ exports.signinWithOTP = async ({ email, otp }) => {
 
         if (!userFromDb) return { statusCode: 409, message: "No user found" };
 
-
+        if(userFromDb.adminVerified == false) return{statusCode:409,message:"Please contact admin. You are not verified."}
 
         if (userFromDb.otp != otp) {
             return { message: "Invalid OTP", statusCode: 409 };
