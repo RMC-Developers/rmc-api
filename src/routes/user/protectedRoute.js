@@ -1,7 +1,7 @@
 const express = require("express");
 
-const {createFuelEntry,getFuelEfficiencyReport,createServiceEntry,getServiceCategories,getServiceLog,getFuelLog,fuelReport,getServiceRateSplitUp,
-    getFuelEfficiencyReportOG,getUser,fillUserProfile,getUserProfileData,getServiceConsumptionReport} = require('../../controllers/user/userController')
+const {createFuelEntry,createServiceEntry,getServiceCategories,getServiceLog,getFuelLog,
+    getFuelEfficiencyReportOG,getUser,fillUserProfile,getUserProfileData,getServiceReport} = require('../../controllers/user/userController')
 
 const router = express.Router();
 
@@ -16,15 +16,7 @@ router.post('/create-fuel-entry',createFuelEntry);
 router.post('/create-service-entry',createServiceEntry);
 
 router.get('/get-fuel-efficiency-report',getFuelEfficiencyReportOG);
-
-//router.get('/get-fuel-efficiency-report',getFuelEfficiencyReport);
-
-//🔴🔴 this route is not needed any more
-//router.get('/get-fuel-report',fuelReport);
-
-router.get('/get-service-consumption-report',getServiceConsumptionReport);
-router.get('/get-service-splitup',getServiceRateSplitUp);
-
+router.get('/get-service-report',getServiceReport);
 
 router.get('/get-service-log',getServiceLog);
 router.get('/get-fuel-log',getFuelLog);
