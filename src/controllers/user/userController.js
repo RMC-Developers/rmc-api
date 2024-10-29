@@ -106,10 +106,10 @@ exports.signin = async (req, res, next) => {
     }
   };
 
-  exports.getFuelEfficiencyReportTest = async(req, res, next) => {
+  exports.getFuelEfficiencyReportOG = async(req, res, next) => {
     try {
       const response = await efficiencyCalculator(req.body);
-      res.status(response.statusCode).send({message:response.message,efficiencyData:response.data,analytics:response.analytics});
+      res.status(response.statusCode).send({message:response.message,lastFueling:response.data,analytics:response.analytics,lastFuelingSummary:response.lastFuelingSummary});
     } catch (error) {
       const err = new Error(error.message);
       next(err);
@@ -118,6 +118,7 @@ exports.signin = async (req, res, next) => {
 
   exports.getFuelEfficiencyReport = async(req, res, next) => {
     try {
+     
       const response = await fuelEfficiencyReport(req.body);
       res.status(response.statusCode).send({message:response.message,analytics:response.analytics});
     } catch (error) {

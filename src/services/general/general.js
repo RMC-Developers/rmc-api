@@ -73,8 +73,7 @@ exports.getServiceCategories = async () => {
 exports.efficiencyCalculator = async ({ userId }) => {
     try {
 
-        //const fuelDataFromDb = await Fuel.find({user:new ObjectId(userId)}).sort({date:1});
-
+    
         const fuelDataFromDb = await Fuel.aggregate([
             {
                 $match: {
@@ -97,7 +96,7 @@ exports.efficiencyCalculator = async ({ userId }) => {
         // const sum = fuelDataFromDb.reduce((accumulator, current) => accumulator + current.volume, 0);
         // let totalVolume = sum - fuelDataFromDb[fuelDataFromDb.length -1].volume;
 
-        let volume = fuelDataFromDb[0].volume;
+         let volume = fuelDataFromDb[0].volume;
 
 
 
@@ -139,16 +138,8 @@ exports.efficiencyCalculator = async ({ userId }) => {
             }
         ])
 
-        let analytics = {
-            totalDistance: distance,
-            totalVolume: volume,
-            mileage: mileage,
-            costFor1Km: costFor1Km,
-            fuelFor1Km: fuelFor1Km
-
-        }
-
-        return { statusCode: 200, data: fuelDataFromDb, analytics: fuelAnalytics }
+        
+        return { statusCode: 200, data: fuelDataFromDb[0], analytics: fuelAnalytics[0], lastFuelingSummary:{mileage:mileage,costFor1Km:costFor1Km,fuelFor1Km:fuelFor1Km} }
 
 
     } catch (error) {
