@@ -121,12 +121,14 @@ exports.efficiencyCalculator = async ({ userId }) => {
                     _id: null,
                     firstOdometerReading: { $first: "$odometerReading" },
                     lastOdometerReading: { $last: "$odometerReading" },
-                    totalVolumeOfFuelConsumed: {
-                        $sum: "$volume"
-                    },
-                    totalCostForFuelConsumed: {
-                        $sum: { $multiply: ["$unitPrice", "$volume"] }
-                    }
+                    totalVolumeOfFuelConsumed: { $sum: "$volume" },
+                    totalCostForFuelConsumed: { $sum: { $multiply: ["$unitPrice", "$volume"] } }
+                }
+            },
+            {
+                $addFields: {
+                    totalVolumeOfFuelConsumed: { $round: ["$totalVolumeOfFuelConsumed", 2] },
+                    totalCostForFuelConsumed: { $round: ["$totalCostForFuelConsumed", 2] }
                 }
             },
             {

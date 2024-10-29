@@ -361,27 +361,7 @@
         }
       }
     },
-    "/v1/user/get-fuel-efficiency-report-test": {
-      "get": {
-        "description": "",
-        "responses": {
-          "default": {
-            "description": ""
-          }
-        }
-      }
-    },
     "/v1/user/get-fuel-efficiency-report": {
-      "get": {
-        "description": "",
-        "responses": {
-          "default": {
-            "description": ""
-          }
-        }
-      }
-    },
-    "/v1/user/get-fuel-report": {
       "get": {
         "description": "",
         "responses": {
