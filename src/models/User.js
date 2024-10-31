@@ -7,61 +7,54 @@ const userSchema = new Schema({
     type: Schema.Types.String,
     required: true,
   },
-  membershipId: {
-    type: Schema.Types.Number,
-  },
+  membershipId: Schema.Types.Number,
   email: {
     type: Schema.Types.String,
     required: true,
   },
+  password: Schema.Types.String,
+  otp: Schema.Types.String,
 
-  password: {
-    type: Schema.Types.String,
+  personalDetails: {
+    dob: { type: Schema.Types.Date, default: null },
+    phone: { type: Schema.Types.Number, default: null },
+    phoneCountryCode: { type: Schema.Types.Number, default: null },
+    whatsappNumber: { type: Schema.Types.Number, default: null },
+    whatsappNumberCountryCode: { type: Schema.Types.Number, default: null },
+    bloodGroup: { type: Schema.Types.String, default: null },
+    willingToDonate: { type: Schema.Types.Boolean, default: false },
+    address: { type: Schema.Types.String, default: null },
+    pincode: { type: Schema.Types.Number, default: null },
+    postOffice: { type: Schema.Types.String, default: null },
+    district: { type: Schema.Types.String, default: null },
+    state: { type: Schema.Types.String, default: null },
   },
 
-  otp:{
-    type:Schema.Types.String
+  vehicleDetails: {
+    registrationNumber: { type: Schema.Types.String, default: null },
+    colour: { type: Schema.Types.String, default: null },
+    registeredYear: { type: Schema.Types.String, default: null },
+    variant: { type: Schema.Types.String, default: null },
+    chasisNumber: { type: Schema.Types.String, default: null },
+    engineNumber: { type: Schema.Types.String, default: null },
+    insuranceUpTo: { type: Schema.Types.Date, default: null },
+    pucUpto: { type: Schema.Types.Date, default: null },
+    fitnessUpto: { type: Schema.Types.Date, default: null },
+    taxUpto: { type: Schema.Types.Date, default: null },
   },
 
-  personalDetails:{
-    dob:Schema.Types.Date,
-    phone:Schema.Types.Number,
-    phoneCountryCode:Schema.Types.Number,
-    whatsappNumber:Schema.Types.Number,
-    whatsappNumberCountrCode:Schema.Types.Number,
-    bloodGroup:Schema.Types.String,
-    willingToDonate:Schema.Types.Boolean,
-    address:Schema.Types.String,
-    pincode:Schema.Types.Number,
-    postOffice:Schema.Types.String,
-    district:Schema.Types.String,
-    state:Schema.Types.String,
-
+  adminVerified: {
+    type: Schema.Types.Boolean,
+    default: false,
   },
-
-  vehicleDetails:{
-    registrationNumber:Schema.Types.String,
-    colour:Schema.Types.String,
-    registeredYear:Schema.Types.String,
-    variant:Schema.Types.String,
-    chasisNumber:Schema.Types.String,
-    engineNumber:Schema.Types.String,
-    insuranceUpTo:Schema.Types.Date,
-    pucUpto:Schema.Types.Date,
-    fitnessUpto:Schema.Types.Date,
-    taxUpto:Schema.Types.Date
+  deleted: {
+    type: Schema.Types.Boolean,
+    default: false,
   },
-
-  adminVerified:{
-    type:Schema.Types.Boolean,
-    default:false,
-  },
-  deleted:{
-    type:Schema.Types.Boolean,
-    default:false,
-  }
-
 });
+
+
+
 
 module.exports = mongoose.model("User",userSchema);
 
