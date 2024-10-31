@@ -69,7 +69,7 @@ exports.signin = async (req, res, next) => {
   exports.getUserProfileData = async (req, res, next) => {
     try {
       const response = await getUserProfileData(req.body);
-      res.status(response.statusCode).send({message:response.message,profileData:response.profileData});
+      res.status(response.statusCode).send({message:response.message,profileData:response.profileData,qr:response.qr});
     } catch (error) {
       const err = new Error(error.message);
       next(err);

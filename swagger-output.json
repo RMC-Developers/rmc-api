@@ -371,17 +371,7 @@
         }
       }
     },
-    "/v1/user/get-service-consumption-report": {
-      "get": {
-        "description": "",
-        "responses": {
-          "default": {
-            "description": ""
-          }
-        }
-      }
-    },
-    "/v1/user/get-service-splitup": {
+    "/v1/user/get-service-report": {
       "get": {
         "description": "",
         "responses": {

@@ -1,8 +1,9 @@
 const ObjectId = require("mongoose").Types.ObjectId;
 
 const User = require('../../models/User');
+const QR = require('../../models/QR');
 
-const { JWT_SECRET_KEY,RMCID_RANGE } = require('../../configurations/constants');
+const { JWT_SECRET_KEY,RMCID_RANGE, SERVER_DOMAIN } = require('../../configurations/constants');
 const { GenerateOTP, createRequestAcceptOrDeclineContent } = require('../../utils/common');
 const { sentMail, notifiyingAdminAboutTheNewRequest } = require('../../utils/mail');
 const { joinRequestContent,notifyCustomerAboutAdminApprovel } = require('../../helpers/contentMaker');
@@ -260,7 +261,10 @@ exports.getUserProfileData = async ({ userId }) => {
 
         const userFromDb = await User.findById(userId, { password: 0, otp: 0, __v: 0 });
         if (!userFromDb) return { statusCode: 409, message: `User not found` }
-        return { statusCode: 200, profileData: userFromDb }
+        const userQR = await QR.findOne({membershipId:userFromDb.membershipId,deleted:false},{qrCode:1,id:1});
+        let qrLink = null;
+        if(userQR) qrLink = `${SERVER_DOMAIN}/v1/qr/scan?id=${userQR._id}`;
+        return { statusCode: 200, profileData: userFromDb,qr:qrLink }
 
     } catch (error) {
         console.log(error);
