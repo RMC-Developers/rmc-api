@@ -77,7 +77,7 @@ exports.getUserList = async ({ }) => {
                         $concat: [RMCID_PREFIX, { $toString: "$membershipId" }]
                     },
                     whatsapp: {
-                        $concat: [{ $toString: "$personalDetails.whatsappNumberCountrCode" }, "", { $toString: "$personalDetails.whatsappNumber" }]
+                        $concat: [{ $toString: "$personalDetails.whatsappNumberCountryCode" }, "", { $toString: "$personalDetails.whatsappNumber" }]
                     },
                     phone: {
                         $concat: [{ $toString: "$personalDetails.phoneCountryCode" }, { $toString: "$personalDetails.phone" }]
@@ -234,7 +234,7 @@ exports.viewAParticularUser = async ({ userId }) => {
                         $concat: ["$vehicleDetails.variant", ""]
                     },
                     whatsapp: {
-                        $concat: [{ $toString: "$personalDetails.whatsappNumberCountrCode" }, "", { $toString: "$personalDetails.whatsappNumber" }]
+                        $concat: [{ $toString: "$personalDetails.whatsappNumberCountryCode" }, "", { $toString: "$personalDetails.whatsappNumber" }]
                     },
                     phone: {
                         $concat: [{ $toString: "$personalDetails.phoneCountryCode" }, { $toString: "$personalDetails.phone" }]

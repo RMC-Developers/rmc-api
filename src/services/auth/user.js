@@ -160,7 +160,7 @@ exports.signupThroughForm = async ({ name, email, phoneNumber, whatsappNumber, p
                 postOffice: postOffice,
                 state: state,
                 phoneCountryCode: phoneCountryCode,
-                whatsappNumberCountrCode: whatsappNumberCountryCode,
+                whatsappNumberCountryCode: whatsappNumberCountryCode,
                 address: address,
                 pincode: pincode
             },
