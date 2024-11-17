@@ -8,7 +8,7 @@ module.exports = {
     MAIL_PORT:process.env.MAIL_PORT||587,
     MAIL_USERNAME:process.env.MAIL_USERNAME || 'join@ritzmotoclub.com',
     MAIL_PASSWORD:process.env.MAIL_PASSWORD ||'Browny@2016',
-    SERVER_DOMAIN:'https://rmc-api-38wu.vercel.app',//https://api.ritzmotoclub.com',//rmc-api-38wu-azkrvxjmp-ritzmotorclubs-projects.vercel.app 
+    SERVER_DOMAIN:'https://api.ritzmotoclub.com',//https://api.ritzmotoclub.com',//rmc-api-38wu-azkrvxjmp-ritzmotorclubs-projects.vercel.app 
     RMCID_RANGE:process.env.RMCID_RANGE || 2024100,
     RMCID_PREFIX:process.env.RMCID_PREFIX || 'RMC'
 }
