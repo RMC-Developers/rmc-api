@@ -283,9 +283,9 @@ exports.validateUserRequest = async ({ userId, state }) => {
 
         let res = await User.updateOne({ _id: new ObjectId(userId) }, { $set: { adminVerified: state } });
 
-        let userFromDb = await User.findById(userId,{name:1,email:1});
+        let userFromDb = await User.findById(userId,{name:1,email:1,membershipId:1});
 
-        let mailContent = notifyCustomerAboutAdminApprovel({name:userFromDb.name});
+        let mailContent = notifyCustomerAboutAdminApprovel({name:userFromDb.name,membershipId:userFromDb.membershipId});
 
         await sentMail({toAddress:userFromDb.email,subject:'Thank You for Joining RitzMotoClub!',content:mailContent});
 

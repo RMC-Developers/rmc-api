@@ -54,7 +54,7 @@ exports.joinRequestContent = ({ name, place,registrationNo, phone, whatsapp, use
 }
 
 
-exports.notifyCustomerAboutAdminApprovel = ({ name }) => {
+exports.notifyCustomerAboutAdminApprovel = ({ name, membershipId }) => {
 
     let content = `
     <!DOCTYPE html>
@@ -70,6 +70,8 @@ exports.notifyCustomerAboutAdminApprovel = ({ name }) => {
                 <h4 style="color: #333,font-weight: bold;">Dear ${name}</h4>
                 <h2 style="color: #333;">Welcome to the Club!</h2>
                 <p>We're excited to have you as a member of RitzMotoClub, the premier community for Maruti Ritz enthusiasts. Your registration has been successfully completed, and we can't wait to share our passion for the Maruti Ritz with you.</p>
+                <h2 style="color: #333;">Membership Details</h2>
+                <p>Your Membership ID: ${membershipId}</p>
                 <h2 style="color: #333;">What's Next?</h2>
                 <ul>
                     <li><strong>Exclusive Content:</strong> As a member, you'll get access to exclusive content, tips, and resources.</li>
