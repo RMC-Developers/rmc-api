@@ -10,6 +10,8 @@ router.post('/assign-membershipid',adminController.assingAMembershipIdToAUser)
 
 router.post('/create-qr',adminController.createQRCode);
 
+router.post('/create-rmc-qr',adminController.createRMCQRCode);
+
 router.get('/list-members',adminController.listUsers);
 
 router.get('/list-qrs',adminController.listQR);

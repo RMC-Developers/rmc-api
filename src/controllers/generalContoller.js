@@ -12,3 +12,16 @@ exports.readQR = async (req,res,next)=>{
         next(err);
     }
 }
+
+exports.readRMCQR = async (req,res,next)=>{
+    try {
+
+        req.body.id = req.query.id;
+        const response = await qrServices.readRMCQR(req.body);
+        res.redirect(response.link);
+        
+    } catch (error) {
+        const err = new Error(error.message);
+        next(err);
+    }
+}

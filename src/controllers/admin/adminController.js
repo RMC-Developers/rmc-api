@@ -1,7 +1,7 @@
 const {createServiceCategory, getUserList, createQRCode, listAllQRs, viewAParticularQR,
    assingMembershipIdToAQr, toggleToLandingPageState,assignAUserWithMembershipID,
     assingMembershipIdToAQrWithAlreadyExistedMembershipId,
-    viewAParticularUser} = require('../../services/admin/admin')
+    viewAParticularUser, createRMCQRCode} = require('../../services/admin/admin')
 
 
 exports.createServiceCategory = async (req, res, next) => {
@@ -17,6 +17,16 @@ exports.createServiceCategory = async (req, res, next) => {
   exports.createQRCode = async (req, res, next) => {
     try {
       const response = await createQRCode(req.body);
+      res.status(response.statusCode).send({message:response.message});
+    } catch (error) {
+      const err = new Error(error.message);
+      next(err);
+    }
+  };
+
+  exports.createRMCQRCode = async (req, res, next) => {
+    try {
+      const response = await createRMCQRCode(req.body);
       res.status(response.statusCode).send({message:response.message});
     } catch (error) {
       const err = new Error(error.message);

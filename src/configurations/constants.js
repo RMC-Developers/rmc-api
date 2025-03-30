@@ -10,5 +10,6 @@ module.exports = {
     MAIL_PASSWORD:process.env.MAIL_PASSWORD ||'Browny@2016',
     SERVER_DOMAIN:'https://api.ritzmotoclub.com',//https://api.ritzmotoclub.com',//rmc-api-38wu-azkrvxjmp-ritzmotorclubs-projects.vercel.app 
     RMCID_RANGE:process.env.RMCID_RANGE || 2024100,
-    RMCID_PREFIX:process.env.RMCID_PREFIX || 'RMC'
+    RMCID_PREFIX:process.env.RMCID_PREFIX || 'RMC',
+    RMC_QR_LINK:'https://ritzmotoclub.com/qr/'
 }

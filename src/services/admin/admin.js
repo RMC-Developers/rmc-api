@@ -3,6 +3,7 @@ const ObjectId = require("mongoose").Types.ObjectId;
 const ServiceCategory = require('../../models/ServiceCategory');
 const User = require('../../models/User');
 const QR = require('../../models/QR');
+const RMCQR = require('../../models/RMCQR')
 
 const { SERVER_DOMAIN, RMCID_RANGE, RMCID_PREFIX } = require('../../configurations/constants')
 
@@ -117,6 +118,30 @@ exports.createQRCode = async ({ }) => {
         })
 
         return { statusCode: 200, message: "QR Code created success" }
+
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
+
+}
+
+exports.createRMCQRCode = async ({ }) => {
+
+    try {
+
+        const qrObj = new RMCQR({});
+        let res = await qrObj.save();
+
+        let qrCodeURL = await qrHelpers.createQrCodeToAURL(`${SERVER_DOMAIN}/v1/qr/scan_rmc?id=${res._id}`);
+
+        let update = await RMCQR.updateOne({ _id: new ObjectId(res._id) }, {
+            $set: {
+                qrCode: qrCodeURL
+            }
+        })
+
+        return { statusCode: 200, message: "RMC QR Code created success" }
 
     } catch (error) {
         console.log(error);
