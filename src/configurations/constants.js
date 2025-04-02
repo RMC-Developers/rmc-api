@@ -11,5 +11,6 @@ module.exports = {
     SERVER_DOMAIN:'https://api.ritzmotoclub.com',//https://api.ritzmotoclub.com',//rmc-api-38wu-azkrvxjmp-ritzmotorclubs-projects.vercel.app 
     RMCID_RANGE:process.env.RMCID_RANGE || 2024100,
     RMCID_PREFIX:process.env.RMCID_PREFIX || 'RMC',
-    RMC_QR_LINK:'https://ritzmotoclub.com/qr/'
+    RMC_QR_LINK:'https://ritzmotoclub.com/qr/',
+    AUTO_PING_URL:'https://autoping-ten.vercel.app/'
 }
