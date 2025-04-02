@@ -18,7 +18,7 @@ exports.readQR = async ({id})=>{
         if(qrFromDb.deleted) return {toLandingPage:true, link:constants.RMC_QR_LINK}
         if(qrFromDb.toLandingPage) return {toLandingPage:true, link:constants.RMC_QR_LINK}
         if(qrFromDb.membershipId == null && qrFromDb.toLandingPage) return {toLandingPage:true, link:constants.RMC_QR_LINK}
-        if(qrFromDb != null) return {toLandingPage:false,link:`constants.AUTO_PING_URL?id=${userDetailsFromDb._id}}`}
+        if(qrFromDb != null) return {toLandingPage:false,link:`${constants.AUTO_PING_URL}?id=${userDetailsFromDb._id}}`}
         
         
     } catch (error) {
